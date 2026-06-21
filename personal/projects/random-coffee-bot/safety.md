@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 # Safety и trust
 
 ## Принцип

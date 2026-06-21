@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 # Игра про dating swipe
 
 ## Идея

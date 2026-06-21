@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 # Maestra — Workflow
 
 Personal task tracking for Maestra work. Источник задач — Slack. Жильё — `tasks.md`, архив — `completed/YYMMDD.md`. Автоматизация — скилл `maestra-tasks` в `~/vault/.claude/skills/`.

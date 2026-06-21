@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 # История формата Random Coffee и curated introductions
 
 Этот проект не списан с одного конкретного продукта. Он собирает несколько линий: random coffee в организациях, curated introductions в сообществах, dating/matchmaking и Telegram-first UX.

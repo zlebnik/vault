@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 # Random Coffee бот для дейтинг-комьюнити
 
 ## Идея
