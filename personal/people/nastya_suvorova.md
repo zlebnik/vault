@@ -2,6 +2,7 @@
 type: Note
 _favorite: true
 _favorite_index: 1
+_organized: true
 ---
 # Настя Суворова
 
