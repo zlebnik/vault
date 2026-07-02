@@ -7,20 +7,15 @@ _organized: true
 
 ## Active — my move
 
+- [ ] **CF-672 reopened — Julia Lo: sena widget dedup / control когда recs load** — Julia Lo
+  Julia 29.06 reopened: убрать targeting нельзя (виджет полностью исчезает), но с ним «filter out duplicates» ломает соседние reco. Прямой вопрос: обсуждаем ли improvements по control когда recs load? Ответить + подумать про фичу.
+  Widget: https://sena.maestra.io/personalization/reco-widget/52707
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1773338878182269
+
 - [ ] **CF-1407 — Julia Lo hawaiicoffee: апгрейд темплейтов виджетов до new version** — Julia Lo
   Re-ask 24.06: «could I get your help updating hawaiicoffee widget templates to the newer version» (формат/функционал стрелочек). Gleb: «Sure! All of them, right?». Делать миграцию на бэкенде без пересоздания виджетов (analytics не ломать).
   Folder: https://hawaiicoffee.maestra.io/newcampaigns/reco-widgets?folder=3ab8e393-3d98-4b1f-93d2-e0b0eeeae58d
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782324762714079
-
-- [ ] **CF-1402 — jolyn: 2 новых виджета прыгают на экране** — Anna Stepanova
-  Anna запустила #58244 и #58245, при заходе на карточку «прыгают». Loom есть. Воспроизвести и пофиксить.
-  Widgets: https://jolyn.maestra.io/personalization/reco-widget/58244 · https://jolyn.maestra.io/personalization/reco-widget/58245
-  Loom: https://www.loom.com/share/e87daa90f6a1442797cf7f6bce5d0c88
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782312749710779
-
-- [ ] **Agent feedback Eu: интегрировать правило «без русских комментов в коде»** — Eugenia Smirnova
-  Eu CSMы юзают агента на русском, агент вставляет русские комменты в коде. Обещал интегрировать в «ближайшие дни» вместе с фидбеком из интервью Артёма.
-  DM: https://maestraio.slack.com/archives/D0931NPG63W/p1782286681933139
 
 - [ ] **CF-1384 — selkirkcom: chat + Fabio's errors (San Diego)** — Phil + Sasha
   Чат уже починил («говна поел, довольно оригинально»). Fabio ошибку с ходу не откопал — нужен ещё подход. Скрин получил.
@@ -39,12 +34,26 @@ _organized: true
   Прямой вопрос, ответить.
   Thread: https://maestraio.slack.com/archives/C07KUJQHG93/p1782235209831359
 
+- [ ] **MCP MR #166 (перса) — Roman feedback** — Roman Ivonin
+  Roman: «вроде всё по мете. Попроси агента посмотреть на единообразие параметров и поведения с campaign_list, если ещё нет. + сделать хотя бы по одному snapshot-тесту golden path через tooltester».
+  MR: https://mindbox.gitlab.yandexcloud.net/development/mcp/-/merge_requests/166
+  Thread: https://maestraio.slack.com/archives/C07KUJQHG93/p1782915817553059
+
 - [ ] **Banner carousel: полноценный UI для Swiper settings** _(CF-1020 auto-closed, effort card создан, в pipeline)_ — Julia Lo
   ClearFeed auto-closed после 3 недель. Effort card в Notion. Делать сам dev-work.
   Notion: https://www.notion.so/364e0880507881398261fcf9e23f04a9
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1778625361282019
 
 ## Waiting on others
+
+- [ ] **CF-1428 — Efraim lead-gen popup dup phone (design discussion с Артёмом)** — Artem Zavgorodnii
+  01.07: расписал root cause. profile A с unconfirmed phone блокирует B с тем же phone (2% error rate = 14 of 642 calls). Артём предложил «captured email на новый profile при phone-конфликте» + отдельная регистрация email/phone. «Needs some thinking». Ждём дизайн-решение Артёма.
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782422545098389
+
+- [ ] **CF-1430 — hawaiicoffee BigCommerce dropdown variant (widget 58272)** — Eugenia + Julia Lo
+  Варианты из коробки не работают на BigCommerce. Отправил пример ожидаемого JSON-фида (variants per товар: картинка, цена, название). Eu пошла к Julia уточнить про сбор фида. Артёму fyi.
+  Widget: https://hawaiicoffee.maestra.io/personalization/reco-widget/58272
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782457814996109
 
 - [ ] **CF-1343 — Efraim popup image padding** — Efraim Hermes
   Спросил «did you try set width? у тебя size 40% поэтому padding». Пинганул ещё раз 25.06. Жду ответ.
@@ -58,17 +67,13 @@ _organized: true
   25.06: посмотрел все 3 статьи. 1 и 2 OK (отметил битые symbols в troubleshooting в article 1, скрин дал). По article 3 — стоит упомянуть, что в headless mode клиент может делать server-side или direct API calls без site personalization. Жду Julia P apply.
   Thread: https://maestraio.slack.com/archives/C0A36LV9XEG/p1782332023283429
 
-- [ ] **lucyandyak: кнопка notify me показывается до выбора размера** _(после первого фикса мигания)_ — Anna Stepanova
-  Anna протестировала на новом клиенте: «notify me» вылазит каждый раз когда customer заходит на карточку, ещё не выбрав размер. Gleb улучшил («они сразу показывают sold out сами»). Жду re-test Anna.
-  Thread: https://maestraio.slack.com/archives/C09M9UEA6BZ/p1781533869277449
-
-- [ ] **Selkirk: 5-product carousel cards (CF-1120) — prototype отдан клиенту** — Philipp + Sasha Haishun
-  Сделал prototype на selkirkcom widget #58101, отдал Phil/клиенту 17.06. Ждём feedback.
+- [ ] **CF-1120 — Selkirk 5-product carousel** — Philipp + Sasha Haishun
+  01.07 объяснил структуру + пинганул Sasha «как прогресс, нужна ещё помощь?». Ждём.
   Prototype: https://selkirkcom.maestra.io/personalization/reco-widget/58101
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1779822892936139
 
 - [ ] **CF-1351 — Anna lucyandyak custom forms** — Anna Stepanova
-  Спросил «чем не подходят стандартные шаблоны?», жду ответ Anna.
+  Спросил «чем не подходят стандартные шаблоны?», пинганул ещё раз 01.07 «Ань, вернёшься?». Жду ответ.
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1781849978020609
 
 - [ ] **CF-798 — Julia: quiz attribution → product rec** _(low prio, на Danil)_ — Julia Lo + Danil
@@ -81,6 +86,11 @@ _organized: true
 
 ## To verify
 
+- [ ] **CF-1469 — Coolibar: product images отображаются неверно при выборе item** — Alexandra Ryazantseva
+  30.06: создал GitHub issue #1133. Ждём разбирательство.
+  Issue: https://github.com/maestra-io/issues-maestra/issues/1133
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782831586584899
+
 - [ ] **Shopify-app: сделать ID блока обязательным** — Артём подтвердил
   Не на мне, проверить когда выкатят.
   Thread: https://maestraio.slack.com/archives/C07KUJQHG93/p1779115929682469
@@ -90,7 +100,3 @@ _organized: true
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1780920351147619
 
 ## Scheduled / future
-
-- [ ] **до 26.06 — занести «add-to-cart JS-код» в продукт целиком** — Anna Stepanova + всё больше клиентов
-  Обещал «до конца следующей недели в продукт занесём целиком».
-  Last thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1781710943353579
