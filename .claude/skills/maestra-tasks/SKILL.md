@@ -52,25 +52,30 @@ Steps:
 
 Trigger: user asks «покажи задачи», «показывай текущее», «давай список», «show tasks», «выводи active», или периодически после wrap-up/scan.
 
-**Output format — compact, one item = 2 lines:**
+**Output format — compact:**
 
 ```
-N. ⚠️ **Bold title** _(tags if any)_ — кто/откуда: краткий контекст (1 строка, suffix critical info).
-   <permalink>
+[CF-NNNN] Короткое саммари (одна строка, suffix critical info)
+<slack thread permalink>
+<релевантная ссылка 1>
+<релевантная ссылка 2>
 ```
 
 Rules:
-- **Numbered** within each section.
-- **One-line context** — что просят / что обещал / последнее состояние. Cut decorative wording. Если в tasks.md написано «(1) ... (2) ...» — оставь как `#1 X · #2 Y`.
-- **`⚠️` prefix** for overdue / high-prio / `_(overdue +Nd)_` items only.
-- **`_(tag)_` inline** — overdue / CF-NNNN / status hint. Drop if нет.
-- **Permalink on its own line** under the item, no label («Thread:» / «MR:» — убирать). If task has multiple links — keep only the primary one (Slack thread > MR > Notion).
+- **ID first в квадратных скобках** — `[CF-1234]` для ClearFeed, `[MR #907]` / `[PR #187]` для code review, `[GH #1170]` для GitHub issues, или короткий тэг для не-CF (`[#alerts]`, `[Banner UI]`, `[Popup skill]`). Задача без явного ID — просто короткий тэг типа `[4ocean]` или `[furniturefairnet]`.
+- **Короткое саммари** — что делать / что обещал / что ждём. Одна строка. Cut decorative wording.
+- **`⚠️` prefix перед `[ID]`** for overdue / high-prio / `_(overdue +Nd)_` items only.
+- **`_(tag)_` inline в саммари** — overdue / status hint (waiting-since / effort filed / etc). Drop если нет.
+- **Slack thread permalink на отдельной строке** сразу под саммари.
+- **Релевантные ссылки — максимум 2** (widget URL, GitHub issue, Notion effort, MR). Каждая на своей строке. Если нет — не добавляй.
 - **Group by section** — Active / Waiting on others / To verify. Skip empty sections.
+- **Не нумеруй** items — ID и так уникален.
 - **Stats footer** at end: `N active · M waiting · K to verify · S scheduled = T open`.
 
 DO NOT:
 - Render full multi-paragraph context from tasks.md.
-- Include all links (PR + MR + Notion + Thread). Pick one.
+- Include >2 relevant links.
+- Add labels перед ссылками («Thread:» / «MR:» — убирать; ID уже в саммари).
 - Add commentary at top («here's the list»). Just render.
 
 ### Scanning Slack for new tasks

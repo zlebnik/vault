@@ -43,7 +43,7 @@
 | `price_cart_order` | `"1"` | price/cart layout | какой первым |
 | `card_picture_ordering` | `"1"` | card ordering | order-index картинки |
 | `card_variant_ordering` | `"7"` | card ordering | order-index dropdown вариантов |
-| `card_aux_html_ordering` | `"6"` | card ordering | order-index aux-блока |
+| `"card_aux_html_ordering"` | `"6"` | card ordering | order-index aux-блока |
 | `card_aux_html_show` | `"0"` | aux html | вкл/выкл aux-блок |
 | `card_aux_html_field` | `""` | aux html | какое customField рендерить |
 | `card_shadow_color` | `"#000000"` | shadow | цвет тени (был hardcoded) |

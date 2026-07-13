@@ -7,24 +7,24 @@ _organized: true
 
 ## Active — my move
 
+- [ ] **furniturefairnet: улучшить CheckoutContactInfoSubmitted (не вызывать без данных)** — Alex Glazkov
+  Alex Glazkov 07.07: drhonow с 03.07 без ошибок (app embed tracker fix помог). А у furniturefairnet CheckoutContactInfoSubmitted всё ещё сыпет. Просит доулучшить чтобы не вызывать если нет данных по контакту.
+  Failed logs: https://furniturefairnet.maestra.io/integration-logs/operations?operation=furniturefairnet.Shopify.CheckoutContactInfoSubmitted&operations-status=Failed
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783428508223759
+
+- [ ] **CF-1564 — Eugenia lucyandyak: reco не подгружаются в мини-корзину без reload** — Eugenia Smirnova
+  Site не обновляет страницу с корзиной, из-за этого reco не подтягиваются. Разобрал: сайт хитро себя ведёт, нужен код блока целиком. «Цепанем в спринте», делать нашу карточку.
+  Widget: https://lucyandyak.maestra.io/personalization/reco-widget/58077
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783510386327129
+
 - [ ] **CF-672 reopened — Julia Lo: sena widget dedup / control когда recs load** — Julia Lo
   Julia 29.06 reopened: убрать targeting нельзя (виджет полностью исчезает), но с ним «filter out duplicates» ломает соседние reco. Прямой вопрос: обсуждаем ли improvements по control когда recs load? Ответить + подумать про фичу.
   Widget: https://sena.maestra.io/personalization/reco-widget/52707
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1773338878182269
 
-- [ ] **CF-1407 — Julia Lo hawaiicoffee: апгрейд темплейтов виджетов до new version** — Julia Lo
-  Re-ask 24.06: «could I get your help updating hawaiicoffee widget templates to the newer version» (формат/функционал стрелочек). Gleb: «Sure! All of them, right?». Делать миграцию на бэкенде без пересоздания виджетов (analytics не ломать).
-  Folder: https://hawaiicoffee.maestra.io/newcampaigns/reco-widgets?folder=3ab8e393-3d98-4b1f-93d2-e0b0eeeae58d
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782324762714079
-
 - [ ] **CF-1384 — selkirkcom: chat + Fabio's errors (San Diego)** — Phil + Sasha
   Чат уже починил («говна поел, довольно оригинально»). Fabio ошибку с ходу не откопал — нужен ещё подход. Скрин получил.
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782235350667279
-
-- [ ] **CF-1315 zone3 reco — плавающий баг мобиле** _(Alexandra: Samsung S25 + Samsung fold)_ — Eugenia + Alexandra
-  «Дорваться» до этих девайсов и воспроизвести. Карточка слева уходит за экран, при каждом прокручивании всё больше. По дизайну: часть второй карточки торчит справа.
-  Widget: https://zone3.maestra.io/personalization/reco-widget/55349
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1781675187671859
 
 - [ ] **#alerts-critical — Roman: «знаешь что-то про такие алерты?»** _(non-urgent)_ — Roman Ivonin
   Roman: «не срочно. это как ни странно не я». Посмотреть alert thread.
@@ -34,17 +34,35 @@ _organized: true
   Прямой вопрос, ответить.
   Thread: https://maestraio.slack.com/archives/C07KUJQHG93/p1782235209831359
 
-- [ ] **MCP MR #166 (перса) — Roman feedback** — Roman Ivonin
-  Roman: «вроде всё по мете. Попроси агента посмотреть на единообразие параметров и поведения с campaign_list, если ещё нет. + сделать хотя бы по одному snapshot-тесту golden path через tooltester».
-  MR: https://mindbox.gitlab.yandexcloud.net/development/mcp/-/merge_requests/166
-  Thread: https://maestraio.slack.com/archives/C07KUJQHG93/p1782915817553059
-
 - [ ] **Banner carousel: полноценный UI для Swiper settings** _(CF-1020 auto-closed, effort card создан, в pipeline)_ — Julia Lo
   ClearFeed auto-closed после 3 недель. Effort card в Notion. Делать сам dev-work.
   Notion: https://www.notion.so/364e0880507881398261fcf9e23f04a9
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1778625361282019
 
 ## Waiting on others
+
+- [ ] **CF-1315 — zone3 reco Samsung S25/fold** _(жду видео от Alexandra)_ — Eugenia + Alexandra
+  06.07 Alexandra спросила когда возьмусь. Не нашёл людей с этими телефонами; попросил её записать видео для помощи с воспроизведением.
+  Widget: https://zone3.maestra.io/personalization/reco-widget/55349
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1781675187671859
+
+- [ ] **CF-1572 — Anna lucyandyak: лимитировать показ одного варианта для многих group id** — Artem Zavgorodnii
+  Разные цвета в разных product-группах → дубли в reco. Артёму — в бэклог, интегрироваться с шопи «даже с самым говнистым».
+  Widget: https://lucyandyak.maestra.io/personalization/reco-widget/57936
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783521312507119
+
+- [ ] **CF-1407 — Julia Lo hawaiicoffee: миграция шаблонов (первый мигрирован, жду feedback)** — Julia Lo
+  Мигрировал один виджет по diff'у из `tasks-context/hawaiicoffee-migration-diff.md`. Ждём проверки Julia + сигнал для остальных.
+  Folder: https://hawaiicoffee.maestra.io/newcampaigns/reco-widgets?folder=3ab8e393-3d98-4b1f-93d2-e0b0eeeae58d
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782324762714079
+
+- [ ] **CF-1522 — Anna: lucyandyak Tapcart integration** — Anna Stepanova
+  07.07: эффорт заведён, Anna: «когда лучше вернуться за апдейтом?». Gleb: «через пару недель, скорее всего». Waiting.
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783343092698879
+
+- [ ] **CF-1498 — coolibar new pop-up с auth code, 2-й раз не работает** — Alexandra Ryazantseva
+  Popup: https://coolibar.maestra.io/personalization/pop-up/58478
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783020763145839
 
 - [ ] **CF-1428 — Efraim lead-gen popup dup phone (design discussion с Артёмом)** — Artem Zavgorodnii
   01.07: расписал root cause. profile A с unconfirmed phone блокирует B с тем же phone (2% error rate = 14 of 642 calls). Артём предложил «captured email на новый profile при phone-конфликте» + отдельная регистрация email/phone. «Needs some thinking». Ждём дизайн-решение Артёма.
@@ -86,10 +104,20 @@ _organized: true
 
 ## To verify
 
-- [ ] **CF-1469 — Coolibar: product images отображаются неверно при выборе item** — Alexandra Ryazantseva
-  30.06: создал GitHub issue #1133. Ждём разбирательство.
-  Issue: https://github.com/maestra-io/issues-maestra/issues/1133
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782831586584899
+- [ ] **CF-1483 — atlantacutlery loyalty (доделано, ждёт verify)** — Alexandra Ryazantseva
+  Rewards JSON image + Redeem15 разобрал, отдал. Проверить у Alexandra что всё ok.
+  Popup: https://atlantacutlery.maestra.io/personalization/pop-up/58408
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782923957849159
+
+- [ ] **CF-1497 — Alexandra: pop-up не сохранился при создании teaser** — Alexandra Ryazantseva
+  02.07: GitHub issue #1146 создал. Ждём.
+  Issue: https://github.com/maestra-io/issues-maestra/issues/1146
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783010541696629
+
+- [ ] **CF-1560 — Eugenia natvbasics: правый блок начислений не скроллится** — Eugenia Smirnova
+  Скорее всего с крохотного ноута смотрят. GitHub issue #1170 создал.
+  Issue: https://github.com/maestra-io/issues-maestra/issues/1170
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783503843735189
 
 - [ ] **Shopify-app: сделать ID блока обязательным** — Артём подтвердил
   Не на мне, проверить когда выкатят.
