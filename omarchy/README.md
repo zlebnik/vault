@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 # Omarchy / ASUS ROG Flow Z13 (GZ302EA)
 
 Fixes and tweaks for my **ASUS ROG Flow Z13** (AMD **Strix Halo**, Radeon 8060S)

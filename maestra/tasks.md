@@ -12,6 +12,15 @@ _organized: true
   Failed logs: https://furniturefairnet.maestra.io/integration-logs/operations?operation=furniturefairnet.Shopify.CheckoutContactInfoSubmitted&operations-status=Failed
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783428508223759
 
+- [ ] **CF-1610 — Sasha Haishun: Lectric Ebikes quiz + виджет reco (перезавести тест)** — Sasha Haishun
+  Sasha 13.07: Фил попросил перезавести тест на Lectric eBikes. Старый widget 58262, новый 59616. Full контекст в #dev-general.
+  Widget new: https://lectricebikes.maestra.io/personalization/reco-widget/59616
+  Thread: https://maestraio.slack.com/archives/D09LNLKC4TZ/p1783955703639869
+
+- [ ] **selkirkcom / SvahaUSA: clear cart after CheckoutCompleted (pixel fix)** — Alex Glazkov
+  13.07: Price Drop email на уже купленный товар. Alex: cart не очищается после checkout из-за async processing. Клиент репортит несколько раз в неделю. Alex просит quick fix в pixel logic — на trigger «Checkout completed» вызывать «Update cart» для очистки. Alex: «may be more interesting than I thought», продолжает копать.
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783944702245289
+
 - [ ] **CF-1564 — Eugenia lucyandyak: reco не подгружаются в мини-корзину без reload** — Eugenia Smirnova
   Site не обновляет страницу с корзиной, из-за этого reco не подтягиваются. Разобрал: сайт хитро себя ведёт, нужен код блока целиком. «Цепанем в спринте», делать нашу карточку.
   Widget: https://lucyandyak.maestra.io/personalization/reco-widget/58077
@@ -34,11 +43,6 @@ _organized: true
   Прямой вопрос, ответить.
   Thread: https://maestraio.slack.com/archives/C07KUJQHG93/p1782235209831359
 
-- [ ] **Banner carousel: полноценный UI для Swiper settings** _(CF-1020 auto-closed, effort card создан, в pipeline)_ — Julia Lo
-  ClearFeed auto-closed после 3 недель. Effort card в Notion. Делать сам dev-work.
-  Notion: https://www.notion.so/364e0880507881398261fcf9e23f04a9
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1778625361282019
-
 ## Waiting on others
 
 - [ ] **CF-1315 — zone3 reco Samsung S25/fold** _(жду видео от Alexandra)_ — Eugenia + Alexandra
@@ -46,23 +50,14 @@ _organized: true
   Widget: https://zone3.maestra.io/personalization/reco-widget/55349
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1781675187671859
 
-- [ ] **CF-1572 — Anna lucyandyak: лимитировать показ одного варианта для многих group id** — Artem Zavgorodnii
-  Разные цвета в разных product-группах → дубли в reco. Артёму — в бэклог, интегрироваться с шопи «даже с самым говнистым».
-  Widget: https://lucyandyak.maestra.io/personalization/reco-widget/57936
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783521312507119
-
-- [ ] **CF-1407 — Julia Lo hawaiicoffee: миграция шаблонов (первый мигрирован, жду feedback)** — Julia Lo
-  Мигрировал один виджет по diff'у из `tasks-context/hawaiicoffee-migration-diff.md`. Ждём проверки Julia + сигнал для остальных.
-  Folder: https://hawaiicoffee.maestra.io/newcampaigns/reco-widgets?folder=3ab8e393-3d98-4b1f-93d2-e0b0eeeae58d
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1782324762714079
+- [ ] **Banner carousel: полноценный UI для Swiper settings** _(CF-1020 auto-closed, effort card, в pipeline)_ — Julia Lo
+  Effort card в Notion. Waiting в pipeline.
+  Notion: https://www.notion.so/364e0880507881398261fcf9e23f04a9
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1778625361282019
 
 - [ ] **CF-1522 — Anna: lucyandyak Tapcart integration** — Anna Stepanova
   07.07: эффорт заведён, Anna: «когда лучше вернуться за апдейтом?». Gleb: «через пару недель, скорее всего». Waiting.
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783343092698879
-
-- [ ] **CF-1498 — coolibar new pop-up с auth code, 2-й раз не работает** — Alexandra Ryazantseva
-  Popup: https://coolibar.maestra.io/personalization/pop-up/58478
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783020763145839
 
 - [ ] **CF-1428 — Efraim lead-gen popup dup phone (design discussion с Артёмом)** — Artem Zavgorodnii
   01.07: расписал root cause. profile A с unconfirmed phone блокирует B с тем же phone (2% error rate = 14 of 642 calls). Артём предложил «captured email на новый profile при phone-конфликте» + отдельная регистрация email/phone. «Needs some thinking». Ждём дизайн-решение Артёма.
@@ -85,15 +80,6 @@ _organized: true
   25.06: посмотрел все 3 статьи. 1 и 2 OK (отметил битые symbols в troubleshooting в article 1, скрин дал). По article 3 — стоит упомянуть, что в headless mode клиент может делать server-side или direct API calls без site personalization. Жду Julia P apply.
   Thread: https://maestraio.slack.com/archives/C0A36LV9XEG/p1782332023283429
 
-- [ ] **CF-1120 — Selkirk 5-product carousel** — Philipp + Sasha Haishun
-  01.07 объяснил структуру + пинганул Sasha «как прогресс, нужна ещё помощь?». Ждём.
-  Prototype: https://selkirkcom.maestra.io/personalization/reco-widget/58101
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1779822892936139
-
-- [ ] **CF-1351 — Anna lucyandyak custom forms** — Anna Stepanova
-  Спросил «чем не подходят стандартные шаблоны?», пинганул ещё раз 01.07 «Ань, вернёшься?». Жду ответ.
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1781849978020609
-
 - [ ] **CF-798 — Julia: quiz attribution → product rec** _(low prio, на Danil)_ — Julia Lo + Danil
   Reopened Julia: переключить attribution с embedded form на product rec. Danil обещал revisit. Не мой scope, тикет ассайнен на меня по умолчанию.
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1775227485867179
@@ -113,6 +99,10 @@ _organized: true
   02.07: GitHub issue #1146 создал. Ждём.
   Issue: https://github.com/maestra-io/issues-maestra/issues/1146
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783010541696629
+
+- [ ] **CF-1603 — marathonbet-eu / drhonow: попап/виджет не активируется, тестовая ссылка не формируется** — Sofia Romanova + Eugenia
+  10.07: postgres персо тормозил → выяснили downgrade freight на удалённый EU redis (Kargo сам откатил через Octopus stable-train). Промоучили `1.0.2129`, redis снова in-cluster Dragonfly. Downgrade-guard в Octopus template v10 выкачен. Проверить у клиента.
+  Threads: https://maestraio.slack.com/archives/C09M9UEA6BZ/p1783675111508969
 
 - [ ] **CF-1560 — Eugenia natvbasics: правый блок начислений не скроллится** — Eugenia Smirnova
   Скорее всего с крохотного ноута смотрят. GitHub issue #1170 создал.

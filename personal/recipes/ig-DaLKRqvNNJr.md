@@ -5,6 +5,7 @@ status: done
 url: https://www.instagram.com/reel/DaLKRqvNNJr/
 author: thefitnesschef_
 captured: 2026-06-29T15:15:53.000Z
+_organized: true
 ---
 
 # Хрустящие куриные тендеры с соусом «Бэнг Бэнг»
