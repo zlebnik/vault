@@ -40,6 +40,6 @@ case "$1" in
     fi
     ;;
   open)
-    hyprctl keyword monitor "$INTERNAL, preferred, auto, 1"
+    hyprctl keyword monitor "$INTERNAL, preferred, auto, 1.6"
     ;;
 esac
