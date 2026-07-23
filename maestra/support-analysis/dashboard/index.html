@@ -1,0 +1,2871 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personalization Support Analysis — weekly</title>
+<style>
+:root { color-scheme: light; --bg:#fcfcfb; --ink:#0b0b0b; --muted:#898781; --muted2:#5f5e5a; --line:#e1e0d9; --card:#f1efe8;
+  --bug:#a32d2d; --setup:#185fa5; --missing:#534ab7; --custom:#0f6e56; }
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Golos Text", sans-serif; background: var(--bg); color: var(--ink);
+  margin: 0 auto; padding: 26px 30px 60px; max-width: 940px; line-height: 1.55; }
+h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+h2 { font-size: 16.5px; font-weight: 600; margin: 34px 0 10px; }
+.sub { font-size: 12.5px; color: var(--muted); margin: 0 0 18px; }
+a { color: var(--custom); text-decoration: none; } a:hover { text-decoration: underline; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 6px 0 8px; }
+.card { background: var(--card); border-radius: 8px; padding: 13px 15px; }
+.card .label { font-size: 12px; color: var(--muted2); }
+.card .value { font-size: 22px; font-weight: 600; margin-top: 3px; letter-spacing: -0.01em; }
+.card .note { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 12px 0 6px; font-size: 11.5px; color: var(--muted2); }
+.legend span { display: flex; align-items: center; gap: 5px; }
+.sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.chartwrap { position: relative; width: 100%; height: 340px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 6px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11.5px; color: var(--muted2); font-weight: 600; }
+td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 10px; white-space: nowrap; font-weight: 500; }
+.pill.Bug { background:#fcebeb; color:var(--bug); }
+.pill.setup { background:#e6f1fb; color:var(--setup); }
+.pill.missing { background:#eeedfe; color:var(--missing); }
+.pill.custom { background:#e1f5ee; color:var(--custom); }
+.pill.howto { background:#faf0dd; color:#8a5a00; }
+.empty { background: var(--card); border-radius: 8px; padding: 26px; text-align: center; color: var(--muted2); font-size: 13.5px; }
+.empty code { background:#fff; padding:1px 6px; border-radius:5px; }
+.hint { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
+.chartwrap canvas { cursor: pointer; }
+/* per-week detail panel */
+.wk { margin-top: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; background: #fff; }
+.wk .wk-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.wk .wk-head .wk-title { font-size: 14.5px; font-weight: 600; }
+.wk .wk-head .wk-meta { font-size: 12px; color: var(--muted2); }
+.wk .wk-cc { font-size: 12px; color: var(--muted); margin: 2px 0 10px; }
+.wk table { margin-top: 0; }
+.wk td .cause { color: var(--muted2); font-size: 11.5px; }
+.thread-link { white-space: nowrap; font-size: 12px; }
+.thread-link::before { content: "↗ "; }
+.no-link { color: var(--muted); font-size: 11.5px; }
+/* expandable recurring rows */
+tr.rc-row.has-threads { cursor: pointer; }
+tr.rc-row.has-threads:hover td { background: #faf9f5; }
+.rc-toggle { display: inline-block; width: 12px; color: var(--muted2); font-size: 10px; transition: transform .12s; }
+tr.rc-row.open .rc-toggle { transform: rotate(90deg); }
+tr.rc-threads > td { padding: 0; border-bottom: 1px solid var(--line); }
+tr.rc-threads .box { padding: 4px 12px 10px 30px; background: #faf9f5; }
+tr.rc-threads .box ul { margin: 4px 0 0; padding: 0; list-style: none; font-size: 12px; }
+tr.rc-threads .box li { padding: 2px 0; color: var(--muted2); }
+tr.rc-threads .box li .wk-tag { display: inline-block; min-width: 78px; color: var(--muted); font-variant-numeric: tabular-nums; }
+footer { margin-top: 40px; font-size: 11.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+</head>
+<body>
+<h1>Personalization Support Analysis</h1>
+<p class="sub" id="subline">Weekly (Mon–Sun) toil + custom-code tracker · omega shard (lower bound)</p>
+
+<div id="app"></div>
+
+<footer id="foot"></footer>
+
+<!-- data block — replaced wholesale by stage 40 (prompts/40-dashboard.md). Do not hand-edit. -->
+<script id="toil-data" type="application/json">
+{
+  "schemaVersion": 2,
+  "groups": [
+    "Bug",
+    "New client setup",
+    "Missing feature",
+    "Custom code",
+    "How-to"
+  ],
+  "updated": "2026-07-13",
+  "windows": [
+    {
+      "week": "2026-04-13",
+      "iso": "2026-W16",
+      "range": "13–19 Apr",
+      "track": "both",
+      "support": {
+        "Bug": 0,
+        "New client setup": 0,
+        "Missing feature": 1,
+        "Custom code": 1,
+        "How-to": 0
+      },
+      "supportTickets": 2,
+      "customCode": {
+        "total": 44,
+        "htmlcss": 40,
+        "targeting": 7,
+        "integration": 12
+      },
+      "entries": [
+        {
+          "id": "t02",
+          "group": "Missing feature",
+          "cause": "rc-mf-subscription-source-attribution",
+          "causeStory": "No subscription-source attribution (pop-up vs registration)",
+          "client": "Jolyn",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1776262404895879",
+          "summary": "confirm there's really no way to see a subscription's source"
+        },
+        {
+          "id": "t01",
+          "group": "Custom code",
+          "cause": "rc-cc-popup-inline-template-gap",
+          "causeStory": "Pop-up / inline-block template gap → hand-authored markup",
+          "client": "almondcow",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1776117907024229",
+          "summary": "look at this popup (almondcow.co/?pm-test-form=…)"
+        }
+      ]
+    },
+    {
+      "week": "2026-04-20",
+      "iso": "2026-W17",
+      "range": "20–26 Apr",
+      "track": "both",
+      "support": {
+        "Bug": 2,
+        "New client setup": 0,
+        "Missing feature": 2,
+        "Custom code": 0,
+        "How-to": 0
+      },
+      "supportTickets": 4,
+      "customCode": {
+        "total": 52,
+        "htmlcss": 51,
+        "targeting": 5,
+        "integration": 16
+      },
+      "entries": [
+        {
+          "id": "t02",
+          "group": "Bug",
+          "cause": "rc-bug-inline-block-form-localization-missing",
+          "causeStory": "Inline-block settings form missing localization",
+          "client": "natvbasics",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1776907859054669",
+          "summary": "/personalization/inline-block/57047/settings [issue]"
+        },
+        {
+          "id": "t04",
+          "group": "Bug",
+          "cause": "rc-bug-popup-image-responsive-padding",
+          "causeStory": "Popup image padding differs desktop vs mobile",
+          "client": "4ocean",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1777073188580759",
+          "summary": "/personalization/pop-up/57103/settings [issue]"
+        },
+        {
+          "id": "s01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-widget-visual-customization",
+          "causeStory": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+          "client": "?",
+          "source": "slack (concise)",
+          "url": "bundle template / collections reporting",
+          "summary": "bundle template gap + reco report by-collection → reco-visual-customization"
+        },
+        {
+          "id": "t03",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-explicit-cart-rules",
+          "causeStory": "No explicit cart-based reco rules + fallback",
+          "client": "selkirkcom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1777064833857289",
+          "summary": "product recs for Selkirk — they'd like to create [something]"
+        }
+      ]
+    },
+    {
+      "week": "2026-04-27",
+      "iso": "2026-W18",
+      "range": "27 Apr–03 May",
+      "track": "both",
+      "support": {
+        "Bug": 3,
+        "New client setup": 0,
+        "Missing feature": 3,
+        "Custom code": 1,
+        "How-to": 0
+      },
+      "supportTickets": 7,
+      "customCode": {
+        "total": 62,
+        "htmlcss": 59,
+        "targeting": 25,
+        "integration": 13
+      },
+      "entries": [
+        {
+          "id": "t01",
+          "group": "Bug",
+          "cause": "rc-bug-popup-regional-render",
+          "causeStory": "Pop-up regional rendering bug",
+          "client": "doraihome",
+          "source": null,
+          "url": null,
+          "summary": null
+        },
+        {
+          "id": "t02",
+          "group": "Bug",
+          "cause": "rc-bug-reco-replace-content-race",
+          "causeStory": "Reco A/B replace-content race → empty/flickering widget",
+          "client": "lucyandyak",
+          "source": null,
+          "url": null,
+          "summary": null
+        },
+        {
+          "id": "t04",
+          "group": "Bug",
+          "cause": "rc-bug-reco-preview-hash-missing",
+          "causeStory": "Reco preview settings hash unresolvable in DB",
+          "client": "sena",
+          "source": null,
+          "url": null,
+          "summary": null
+        },
+        {
+          "id": "s02",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-widget-visual-customization",
+          "causeStory": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+          "client": "drhonow",
+          "source": null,
+          "url": null,
+          "summary": null
+        },
+        {
+          "id": "t03",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-ranking-opacity-tuning",
+          "causeStory": "Reco ranking opaque + popularity lookback not tunable",
+          "client": "Jolyn",
+          "source": null,
+          "url": null,
+          "summary": null
+        },
+        {
+          "id": "t05",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-mechanic-limit-visibility",
+          "causeStory": "Undisclosed reco-mechanic cap, no self-serve visibility",
+          "client": "jolyn",
+          "source": null,
+          "url": null,
+          "summary": null
+        },
+        {
+          "id": "s01",
+          "group": "Custom code",
+          "cause": "rc-cc-popup-inline-template-gap",
+          "causeStory": "Pop-up / inline-block template gap → hand-authored markup",
+          "client": "Foodcycler",
+          "source": null,
+          "url": null,
+          "summary": null
+        }
+      ]
+    },
+    {
+      "week": "2026-05-04",
+      "iso": "2026-W19",
+      "range": "04–10 May",
+      "track": "both",
+      "support": {
+        "Bug": 3,
+        "New client setup": 0,
+        "Missing feature": 1,
+        "Custom code": 1,
+        "How-to": 0
+      },
+      "supportTickets": 5,
+      "customCode": {
+        "total": 68,
+        "htmlcss": 68,
+        "targeting": 24,
+        "integration": 5
+      },
+      "entries": [
+        {
+          "id": "t02",
+          "group": "Bug",
+          "cause": "rc-bug-popup-heading-textarea-regression",
+          "causeStory": "Pop-up heading text→textarea change broke all pop-ups",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1777989733637179",
+          "summary": "using heading section to place custom HTML on popups (feature/request)"
+        },
+        {
+          "id": "t03",
+          "group": "Bug",
+          "cause": "rc-bug-reco-custom-js-vanishes",
+          "causeStory": "Reco widget custom JS silently vanishes (no audit log)",
+          "client": "zone3",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1778041691240399",
+          "summary": "investigate what went wrong with this widget"
+        },
+        {
+          "id": "t04",
+          "group": "Bug",
+          "cause": "rc-bug-reco-widget-load-latency",
+          "causeStory": "Reco widget backend load latency (slow CDP lookups)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1778148224450769",
+          "summary": "speed up loading of our recommendations widget"
+        },
+        {
+          "id": "s01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-widget-visual-customization",
+          "causeStory": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+          "client": "bokksu",
+          "source": "slack (concise)",
+          "url": "bokksu reco-widget/56999",
+          "summary": "reco mobile layout (all products in one line) → reco-visual-customization"
+        },
+        {
+          "id": "t01",
+          "group": "Custom code",
+          "cause": "rc-cc-legacy-tracker-per-theme-layout",
+          "causeStory": "Legacy manual tracker install fails per theme layout / after rename",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1777916350950869",
+          "summary": "popup preview not loading"
+        }
+      ]
+    },
+    {
+      "week": "2026-05-11",
+      "iso": "2026-W20",
+      "range": "11–17 May",
+      "track": "both",
+      "support": {
+        "Bug": 1,
+        "New client setup": 0,
+        "Missing feature": 1,
+        "Custom code": 1,
+        "How-to": 0
+      },
+      "supportTickets": 3,
+      "customCode": {
+        "total": 91,
+        "htmlcss": 88,
+        "targeting": 28,
+        "integration": 35
+      },
+      "entries": [
+        {
+          "id": "t01",
+          "group": "Bug",
+          "cause": "rc-bug-popup-partial-submission-dropoff",
+          "causeStory": "Pop-up partial-submission misses code-confirm dropoff (lost subs)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1778617232749569",
+          "summary": "behavior of our popups in a particular usecase (user input…)"
+        },
+        {
+          "id": "s01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-widget-visual-customization",
+          "causeStory": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+          "client": "?",
+          "source": "slack (concise)",
+          "url": "thread p1779283… family",
+          "summary": "reco layout: separate widget per screen width (slider→list) → reco-visual-customization"
+        },
+        {
+          "id": "t02",
+          "group": "Custom code",
+          "cause": "rc-cc-legacy-tracker-per-theme-layout",
+          "causeStory": "Legacy manual tracker install fails per theme layout / after rename",
+          "client": "lectricebikes",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1778679483273429",
+          "summary": "/personalization/ — why this product rec [issue]"
+        }
+      ]
+    },
+    {
+      "week": "2026-05-18",
+      "iso": "2026-W21",
+      "range": "18–24 May",
+      "track": "both",
+      "support": {
+        "Bug": 0,
+        "New client setup": 0,
+        "Missing feature": 0,
+        "Custom code": 2,
+        "How-to": 0
+      },
+      "supportTickets": 2,
+      "customCode": {
+        "total": 59,
+        "htmlcss": 53,
+        "targeting": 9,
+        "integration": 18
+      },
+      "entries": [
+        {
+          "id": "t01",
+          "group": "Custom code",
+          "cause": "rc-cc-popup-inline-template-gap",
+          "causeStory": "Pop-up / inline-block template gap → hand-authored markup",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779174559077259",
+          "summary": "help with some pop-ups"
+        },
+        {
+          "id": "t02",
+          "group": "Custom code",
+          "cause": "rc-cc-popup-integration-ops",
+          "causeStory": "Integration JS for API ops, add-to-cart, form handling",
+          "client": "idaka",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779282870874029",
+          "summary": "/personalization/... — look at this widget for Idaka golf"
+        }
+      ]
+    },
+    {
+      "week": "2026-05-25",
+      "iso": "2026-W22",
+      "range": "25–31 May",
+      "track": "both",
+      "support": {
+        "Bug": 2,
+        "New client setup": 0,
+        "Missing feature": 1,
+        "Custom code": 0,
+        "How-to": 1
+      },
+      "supportTickets": 4,
+      "customCode": {
+        "total": 43,
+        "htmlcss": 40,
+        "targeting": 16,
+        "integration": 13
+      },
+      "entries": [
+        {
+          "id": "t02",
+          "group": "Bug",
+          "cause": "rc-bug-reco-zero-weight-algo-op",
+          "causeStory": "Reco op called even when algorithm weight = 0 (failed ops)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779870162822599",
+          "summary": "strange operation popmechanic-widget-55454-reco-2 + errors"
+        },
+        {
+          "id": "t03",
+          "group": "Bug",
+          "cause": "rc-bug-reco-min-count-selector-embed",
+          "causeStory": "Reco min-product-count hide broken on selector-embed",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779874030094519",
+          "summary": "why can('t) my client see the widget"
+        },
+        {
+          "id": "t01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-widget-visual-customization",
+          "causeStory": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+          "client": "selkirkcom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779822892936139",
+          "summary": "Selkirk wants recommendations showing multiple products on one card"
+        },
+        {
+          "id": "t04",
+          "group": "How-to",
+          "cause": "rc-howto-reco-ab-participant-counting",
+          "causeStory": "How-to: reco A/B participant counting (eligibility vs render)",
+          "client": "lectricebikes",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779994668165949",
+          "summary": "A/B tests & reporting question for a reco A/B test"
+        }
+      ]
+    },
+    {
+      "week": "2026-06-01",
+      "iso": "2026-W23",
+      "range": "01–07 Jun",
+      "track": "both",
+      "support": {
+        "Bug": 4,
+        "New client setup": 0,
+        "Missing feature": 2,
+        "Custom code": 0,
+        "How-to": 4
+      },
+      "supportTickets": 10,
+      "customCode": {
+        "total": 70,
+        "htmlcss": 68,
+        "targeting": 17,
+        "integration": 17
+      },
+      "entries": [
+        {
+          "id": "t03",
+          "group": "Bug",
+          "cause": "rc-bug-reco-report-assisted-revenue-double-count",
+          "causeStory": "Reco BI report double-counts assisted revenue (~3x AOV)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780387344597939",
+          "summary": "issue with the Product Recommendations dashboard?"
+        },
+        {
+          "id": "t05",
+          "group": "Bug",
+          "cause": "rc-bug-popup-editor-hidden-field",
+          "causeStory": "Pop-up editor hides name field → stuck placeholder in live pop-up",
+          "client": "natvbasics",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780417106343099",
+          "summary": "/personalization/pop-up/56874/settings"
+        },
+        {
+          "id": "t08",
+          "group": "Bug",
+          "cause": "rc-bug-reco-variant-selector-broken",
+          "causeStory": "Checkout reco variant selector / product name not rendering",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780582938116049",
+          "summary": "variant selection not working in both widgets"
+        },
+        {
+          "id": "t10",
+          "group": "Bug",
+          "cause": "rc-bug-reco-update-pipeline-stuck",
+          "causeStory": "Reco update pipeline stuck (stale items, no alerting)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780697348797889",
+          "summary": "product recommendations stuck in \"updating\" ~1.5h"
+        },
+        {
+          "id": "t06",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-no-variant-data",
+          "causeStory": "No product variant data for reco widget dropdowns",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780567512308009",
+          "summary": "add a second image to a magento product for the widget"
+        },
+        {
+          "id": "t07",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-mechanic-limit-visibility",
+          "causeStory": "Undisclosed reco-mechanic cap, no self-serve visibility",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780581321897409",
+          "summary": "/recommendations-algorithms — please add algorithms"
+        },
+        {
+          "id": "t01",
+          "group": "How-to",
+          "cause": "rc-howto-popup-form-config",
+          "causeStory": "How-to: pop-up form field config + capture-on-close",
+          "client": "copenhagenliving",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780320296258729",
+          "summary": "/personalization/... — why can't we collect names in this form"
+        },
+        {
+          "id": "t02",
+          "group": "How-to",
+          "cause": "rc-howto-popup-form-config",
+          "causeStory": "How-to: pop-up form field config + capture-on-close",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780326565482399",
+          "summary": "help with a pop-up (urgent)"
+        },
+        {
+          "id": "t04",
+          "group": "How-to",
+          "cause": "rc-howto-reco-silent-misconfig",
+          "causeStory": "How-to: reco widget silently broken when a setting isn't enabled",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780399163426149",
+          "summary": "/personalization/reco-widget/57719 + test link"
+        },
+        {
+          "id": "t09",
+          "group": "How-to",
+          "cause": "rc-howto-reco-silent-misconfig",
+          "causeStory": "How-to: reco widget silently broken when a setting isn't enabled",
+          "client": "sarahssilks",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780611238595579",
+          "summary": "help with this widget"
+        }
+      ]
+    },
+    {
+      "week": "2026-06-08",
+      "iso": "2026-W24",
+      "range": "08–14 Jun",
+      "track": "both",
+      "support": {
+        "Bug": 2,
+        "New client setup": 0,
+        "Missing feature": 6,
+        "Custom code": 0,
+        "How-to": 0
+      },
+      "supportTickets": 8,
+      "customCode": {
+        "total": 56,
+        "htmlcss": 53,
+        "targeting": 12,
+        "integration": 12
+      },
+      "entries": [
+        {
+          "id": "t02",
+          "group": "Bug",
+          "cause": "rc-bug-popup-partial-submission-dropoff",
+          "causeStory": "Pop-up partial-submission misses code-confirm dropoff (lost subs)",
+          "client": "bedkingdom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780944580726519",
+          "summary": "/personalization/pop-up/57702 — check this pop-up"
+        },
+        {
+          "id": "t06",
+          "group": "Bug",
+          "cause": "rc-bug-reco-report-assisted-revenue-double-count",
+          "causeStory": "Reco BI report double-counts assisted revenue (~3x AOV)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781256213986689",
+          "summary": "reco widget \"Frequently Bought With\" — PDP add-to-cart button + size selector"
+        },
+        {
+          "id": "s01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-widget-visual-customization",
+          "causeStory": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+          "client": "?",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1781199051649359",
+          "summary": "merchant wants reco templates built on their site carousel (SwiperJS)"
+        },
+        {
+          "id": "s02",
+          "group": "Missing feature",
+          "cause": "rc-mf-shopify-two-way-sync",
+          "causeStory": "No two-way sync of pop-up/segment data to Shopify",
+          "client": "?",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1781207700826419",
+          "summary": "Shopify integration/capabilities: pop-up→Shopify sync, segments, account-portal customization"
+        },
+        {
+          "id": "t01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-widget-visual-customization",
+          "causeStory": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780927113707229",
+          "summary": "please fix these two recommendation widgets"
+        },
+        {
+          "id": "t03",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-widget-visual-customization",
+          "causeStory": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+          "client": "drhonow",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781019663873919",
+          "summary": "/personalization/reco-widget — need help with a recommendation widget"
+        },
+        {
+          "id": "t04",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-image-optimization",
+          "causeStory": "Reco image optimization all-or-nothing (slow vs low quality)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781099438076139",
+          "summary": "is there a backlog for reco improvements I can add to?"
+        },
+        {
+          "id": "t05",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-theme-slot-injection",
+          "causeStory": "No native theme-aware placement (slot / header / cart drawer)",
+          "client": "monkeysports",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781186391436609",
+          "summary": "/personalization/reco-w — help hook up the reco widget"
+        }
+      ]
+    },
+    {
+      "week": "2026-06-15",
+      "iso": "2026-W25",
+      "range": "15–21 Jun",
+      "track": "both",
+      "support": {
+        "Bug": 6,
+        "New client setup": 0,
+        "Missing feature": 4,
+        "Custom code": 2,
+        "How-to": 0
+      },
+      "supportTickets": 12,
+      "customCode": {
+        "total": 64,
+        "htmlcss": 59,
+        "targeting": 8,
+        "integration": 18
+      },
+      "entries": [
+        {
+          "id": "t01",
+          "group": "Bug",
+          "cause": "rc-bug-phone-format-validation",
+          "causeStory": "Phone-format validation missing countries (fixed GH #1071)",
+          "client": "hoeglcom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781520809482949",
+          "summary": "/personalization/inline — phone-format issue in the form"
+        },
+        {
+          "id": "t04",
+          "group": "Bug",
+          "cause": "rc-bug-checkout-reco-settings-ignored",
+          "causeStory": "Checkout reco widget settings ignored (Shopify-side)",
+          "client": "deako",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781632505762839",
+          "summary": "/personalization/reco-widget/55732 — checkout recommendations"
+        },
+        {
+          "id": "t05",
+          "group": "Bug",
+          "cause": "rc-bug-geotargeting-exclusion-ignored",
+          "causeStory": "Geotargeting country-exclusion ignored (fixed)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781636585061709",
+          "summary": "issue with geotargeting?"
+        },
+        {
+          "id": "t06",
+          "group": "Bug",
+          "cause": "rc-bug-reco-carousel-mobile-device",
+          "causeStory": "Reco carousel breaks on specific Android devices",
+          "client": "zone3",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781675187671859",
+          "summary": "/personalization/reco-widget/55349 — take a look at this widget"
+        },
+        {
+          "id": "t07",
+          "group": "Bug",
+          "cause": "rc-bug-popup-rotation-perf-under-load",
+          "causeStory": "Popup rotation degrades under traffic surge",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781705863336709",
+          "summary": "pop-ups working badly"
+        },
+        {
+          "id": "t10",
+          "group": "Bug",
+          "cause": "rc-bug-popup-image-responsive-padding",
+          "causeStory": "Popup image padding differs desktop vs mobile",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781787520745879",
+          "summary": "trouble when creating popups"
+        },
+        {
+          "id": "s01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-template-upgrade-selfserve",
+          "causeStory": "No self-serve reco-widget template upgrade / per-device width",
+          "client": "hawaiicoffee",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1781719637466469",
+          "summary": "reco widgets on old template — update to new one without rebuilding? (matches W26 t04 cause)"
+        },
+        {
+          "id": "s02",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-bundle-discount-on-add",
+          "causeStory": "Bundle reco: no discount-only-when-added-from-rec",
+          "client": "?",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1781790498832899",
+          "summary": "bundle setup like Rebuy (select products added together); note: can't do discount only-when-added-from-rec"
+        },
+        {
+          "id": "t03",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-yotpo-ratings-integration",
+          "causeStory": "No native Yotpo ratings integration for reco widgets",
+          "client": "drhonow",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781631200716869",
+          "summary": "/personalization/reco-widget/58044 — issue with recommendation widget"
+        },
+        {
+          "id": "t08",
+          "group": "Missing feature",
+          "cause": "rc-mf-per-device-placement-selector",
+          "causeStory": "No per-device CSS selector for widget placement",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781783500007889",
+          "summary": "log an improvement for personalization / recommendations"
+        },
+        {
+          "id": "t02",
+          "group": "Custom code",
+          "cause": "rc-cc-dom-dependent-targeting-breaks",
+          "causeStory": "Custom DOM-matching targeting breaks on client markup changes",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781533862203659",
+          "summary": "\"notify in stock\" widget button not working (/personalization/inline)"
+        },
+        {
+          "id": "t09",
+          "group": "Custom code",
+          "cause": "rc-cc-editor-no-script-tag",
+          "causeStory": "Custom-code editor rejects <script> tags",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781784276205999",
+          "summary": "\"did we do something with popups?\" (vague)"
+        }
+      ]
+    },
+    {
+      "week": "2026-06-22",
+      "iso": "2026-W26",
+      "range": "22–28 Jun",
+      "track": "both",
+      "support": {
+        "Bug": 1,
+        "New client setup": 0,
+        "Missing feature": 5,
+        "Custom code": 1,
+        "How-to": 1
+      },
+      "supportTickets": 8,
+      "customCode": {
+        "total": 95,
+        "htmlcss": 94,
+        "targeting": 19,
+        "integration": 26
+      },
+      "entries": [
+        {
+          "id": "t03",
+          "group": "Bug",
+          "cause": "rc-bug-reco-replace-content-race",
+          "causeStory": "Reco A/B replace-content race → empty/flickering widget",
+          "client": "jolyn",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782312749710779",
+          "summary": "launched two new widgets, needs help"
+        },
+        {
+          "id": "t01",
+          "group": "Missing feature",
+          "cause": "rc-mf-computed-props-custom-event-fields",
+          "causeStory": "Computed properties can't aggregate custom event fields",
+          "client": "Aiby",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782232239138659",
+          "summary": "wants personalized pushes/emails based on favorite category (feature request)"
+        },
+        {
+          "id": "t02",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-mechanic-limit-visibility",
+          "causeStory": "Undisclosed reco-mechanic cap, no self-serve visibility",
+          "client": "jolyn",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782300214210689",
+          "summary": "add a custom recommendation at /recommendations-algorithms"
+        },
+        {
+          "id": "t04",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-template-upgrade-selfserve",
+          "causeStory": "No self-serve reco-widget template upgrade / per-device width",
+          "client": "hawaiicoffee",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782324762714079",
+          "summary": "help updating the widget template"
+        },
+        {
+          "id": "t06",
+          "group": "Missing feature",
+          "cause": "rc-mf-popup-lead-dropped-phone-collision",
+          "causeStory": "Lead-gen pop-up silently drops submissions on phone collision",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782422545098389",
+          "summary": "what happens to user information on lead (forms/lead capture)"
+        },
+        {
+          "id": "t07",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-no-variant-data",
+          "causeStory": "No product variant data for reco widget dropdowns",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782457814996109",
+          "summary": "help with the dropdown variant block in the widget"
+        },
+        {
+          "id": "t05",
+          "group": "Custom code",
+          "cause": "rc-cc-dom-dependent-targeting-breaks",
+          "causeStory": "Custom DOM-matching targeting breaks on client markup changes",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782390851350049",
+          "summary": "/personalization/inline-block/57525 — \"эта срань\" (broken)"
+        },
+        {
+          "id": "s01",
+          "group": "How-to",
+          "cause": "rc-howto-reco-preset-purchased-exclusion",
+          "causeStory": "How-to: which reco presets exclude already-purchased products",
+          "client": null,
+          "source": null,
+          "url": null,
+          "summary": null
+        }
+      ]
+    },
+    {
+      "week": "2026-06-29",
+      "iso": "2026-W27",
+      "range": "29 Jun–05 Jul",
+      "track": "both",
+      "support": {
+        "Bug": 4,
+        "New client setup": 0,
+        "Missing feature": 2,
+        "Custom code": 2,
+        "How-to": 0
+      },
+      "supportTickets": 8,
+      "customCode": {
+        "total": 63,
+        "htmlcss": 62,
+        "targeting": 16,
+        "integration": 11
+      },
+      "entries": [
+        {
+          "id": "t03",
+          "group": "Bug",
+          "cause": "rc-bug-popup-ab-migration",
+          "causeStory": "Migration left A/B config broken",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782918270506749",
+          "summary": "error adding an A/B test within the popup creation tool"
+        },
+        {
+          "id": "t07",
+          "group": "Bug",
+          "cause": "rc-bug-popup-editor-unsaved-guard",
+          "causeStory": "Pop-up editor lost unsaved edits (fixed MR !8819)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783010541696629",
+          "summary": "pop-up didn't save after creating a teaser"
+        },
+        {
+          "id": "t08",
+          "group": "Bug",
+          "cause": "rc-bug-popup-sms-auth-intermittent",
+          "causeStory": "Pop-up SMS auth code intermittently failed",
+          "client": "coolibar",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783020763145839",
+          "summary": "/personalization/pop-up/58478 — tested new pop-up with authorization…"
+        },
+        {
+          "id": "t09",
+          "group": "Bug",
+          "cause": "rc-bug-targeting-reach-api-triggered",
+          "causeStory": "Targeting reach = 0 for API-triggered widgets",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783020863858259",
+          "summary": "product matcher UI updates broke something"
+        },
+        {
+          "id": "t01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-theme-slot-injection",
+          "causeStory": "No native theme-aware placement (slot / header / cart drawer)",
+          "client": "zone3",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782813309221179",
+          "summary": "new text bar on Zone3 — \"whole mess getting it placed\""
+        },
+        {
+          "id": "t05",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-single-algo-per-slot",
+          "causeStory": "Reco widget limited to one algorithm per slot",
+          "client": "selkirkcom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782927686071299",
+          "summary": "add a second \"Post-purchase cross-sell\" algorithm for Selkirk"
+        },
+        {
+          "id": "t02",
+          "group": "Custom code",
+          "cause": "rc-cc-no-custom-code-guardrails",
+          "causeStory": "No lint/validation gate on custom code → ships broken",
+          "client": "limevizio",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782897255892259",
+          "summary": "blossomflowerdelivery / limevizio flagged an issue (vague — read)"
+        },
+        {
+          "id": "t04",
+          "group": "Custom code",
+          "cause": "rc-cc-no-custom-code-guardrails",
+          "causeStory": "No lint/validation gate on custom code → ships broken",
+          "client": "atlantacutlery",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782923957849159",
+          "summary": "setting up / fixing the loyalty widget (/personalization/…)"
+        }
+      ]
+    },
+    {
+      "week": "2026-07-06",
+      "iso": "2026-W28",
+      "range": "06–12 Jul",
+      "track": "both",
+      "support": {
+        "Bug": 2,
+        "New client setup": 0,
+        "Missing feature": 3,
+        "Custom code": 1,
+        "How-to": 0
+      },
+      "supportTickets": 6,
+      "customCode": {
+        "total": 60,
+        "htmlcss": 58,
+        "targeting": 8,
+        "integration": 10
+      },
+      "entries": [
+        {
+          "id": "t03",
+          "group": "Bug",
+          "cause": "rc-bug-reco-widget-copy-perf",
+          "causeStory": "Reco-widget copy slow / errors",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783414698568809",
+          "summary": "Unable to copy the widgets"
+        },
+        {
+          "id": "t08",
+          "group": "Bug",
+          "cause": "rc-bug-reco-replace-content-race",
+          "causeStory": "Reco A/B replace-content race → empty/flickering widget",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783688232330459",
+          "summary": "\"опять проблема с люси\" (vague — read to classify/drop)"
+        },
+        {
+          "id": "t04",
+          "group": "Missing feature",
+          "cause": "rc-mf-popup-per-customer-promocode",
+          "causeStory": "Pop-up can’t show a per-customer promo code",
+          "client": "zone3",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783520462864959",
+          "summary": "Zone3: show a unique promo code per customer on final pop-up screen (\"not possible right now\")"
+        },
+        {
+          "id": "t05",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-variant-dedup",
+          "causeStory": "Reco widget repeats colour variants (SKU dedup, no swatches, no self-serve)",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783521312507119",
+          "summary": "lucyayk: лимитировать показ одного варианта для многих групп id"
+        },
+        {
+          "id": "t10",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-variant-dedup",
+          "causeStory": "Reco widget repeats colour variants (SKU dedup, no swatches, no self-serve)",
+          "client": "lucyandyak",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1783520425179659?thread_ts=1782911849.751909",
+          "summary": "#csm-support: Lucy&Yak reco quality (duplicate products across a rec, swatches) + signup popup+modal — thread started 06-30, active in-window"
+        },
+        {
+          "id": "t06",
+          "group": "Custom code",
+          "cause": "rc-cc-client-owned-js-breaks-reco",
+          "causeStory": "Client-owned custom JS zeroes reco eligibility",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783588274253819",
+          "summary": "Не работают рекомендации на проекте"
+        }
+      ]
+    },
+    {
+      "week": "2026-07-13",
+      "iso": "2026-W29",
+      "range": "13–19 Jul",
+      "track": "both",
+      "support": {
+        "Bug": 7,
+        "New client setup": 0,
+        "Missing feature": 4,
+        "Custom code": 1,
+        "How-to": 1
+      },
+      "supportTickets": 13,
+      "customCode": {
+        "total": 69,
+        "htmlcss": 68,
+        "targeting": 12,
+        "integration": 21
+      },
+      "entries": [
+        {
+          "id": "t03",
+          "group": "Bug",
+          "cause": "rc-bug-reco-replace-content-race",
+          "causeStory": "Reco A/B replace-content race → empty/flickering widget",
+          "client": "drhonow",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783941155257219",
+          "summary": "\"Alarm — launched many widgets & recommendations, inline blocks\" (drhonow)"
+        },
+        {
+          "id": "t07",
+          "group": "Bug",
+          "cause": "rc-bug-feed-invalid-char-rejection",
+          "causeStory": "As a client syncing a product feed, a single invisible/zero-width unicode charac",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784022710000989",
+          "summary": "US product feed not loading for lucy"
+        },
+        {
+          "id": "t09",
+          "group": "Bug",
+          "cause": "rc-bug-reco-replace-content-race",
+          "causeStory": "Reco A/B replace-content race → empty/flickering widget",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784108286481209",
+          "summary": "desktop/mobile: add-to-cart / cart-update on click stopped working"
+        },
+        {
+          "id": "t11",
+          "group": "Bug",
+          "cause": "rc-bug-inapp-redirect-not-firing",
+          "causeStory": "As a client, customers who click an in-app message's CTA aren't taken to the con",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784193387998739",
+          "summary": "\"take a look at this in-app\" (in-app/inline message)"
+        },
+        {
+          "id": "t12",
+          "group": "Bug",
+          "cause": "rc-bug-popup-partial-submission-dropoff",
+          "causeStory": "Pop-up partial-submission misses code-confirm dropoff (lost subs)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784214427144459",
+          "summary": "verification code in popup doesn't work"
+        },
+        {
+          "id": "t13",
+          "group": "Bug",
+          "cause": "rc-bug-legacy-feed-ownership-stale",
+          "causeStory": "As a CSM troubleshooting a legacy client, the product feed is stale with no clea",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784279899455249",
+          "summary": "product feed broken — not updating"
+        },
+        {
+          "id": "t14",
+          "group": "Bug",
+          "cause": "rc-bug-popup-ab-migration",
+          "causeStory": "Migration left A/B config broken",
+          "client": "betboom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784284564946539",
+          "summary": "betboom /personalization/pop-up/59687"
+        },
+        {
+          "id": "s01",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-yotpo-ratings-integration",
+          "causeStory": "No native Yotpo ratings integration for reco widgets",
+          "client": "?",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1784213194210719",
+          "summary": "Okendo reviews integration for reco widget (reviews/ratings into feed, like Yotpo)"
+        },
+        {
+          "id": "t05",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-variant-availability-filter",
+          "causeStory": "As a merchandiser/CSM, my reco widget recommends out-of-stock or unpublished var",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783957670801839",
+          "summary": "reco variants show out-of-stock products (lucyandyak)"
+        },
+        {
+          "id": "t06",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-variant-availability-filter",
+          "causeStory": "As a merchandiser/CSM, my reco widget recommends out-of-stock or unpublished var",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784021823125099",
+          "summary": "new ticket: product availability in reco (lucy, client-side stock)"
+        },
+        {
+          "id": "t08",
+          "group": "Missing feature",
+          "cause": "rc-mf-reco-theme-slot-injection",
+          "causeStory": "No native theme-aware placement (slot / header / cart drawer)",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784028042696819",
+          "summary": "\"you may also like\" recommendations not working again"
+        },
+        {
+          "id": "t04",
+          "group": "Custom code",
+          "cause": "rc-cc-no-custom-code-guardrails",
+          "causeStory": "No lint/validation gate on custom code → ships broken",
+          "client": "movavicom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783954538310529",
+          "summary": "movavi — error with our tracker/script?"
+        },
+        {
+          "id": "t10",
+          "group": "How-to",
+          "cause": "rc-howto-targeting-custom-field-audience",
+          "causeStory": "As a CSM, I need a zone/region audience filter but only found a distance-radius ",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784113403113449",
+          "summary": "enable filter by custom-field zones for lucy (targeting)"
+        }
+      ]
+    }
+  ],
+  "recurring": [
+    {
+      "id": "rc-mf-reco-widget-visual-customization",
+      "group": "Missing feature",
+      "story": "Reco widget visual customization not self-serve (CSS/arrows/carousel)",
+      "total_tickets": 8,
+      "total_mechanics": 0,
+      "weeks": 6,
+      "last_seen": "2026-06-08",
+      "threads": [
+        {
+          "week": "2026-06-08",
+          "id": "s01",
+          "client": "?",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1781199051649359",
+          "summary": "merchant wants reco templates built on their site carousel (SwiperJS)"
+        },
+        {
+          "week": "2026-06-08",
+          "id": "t01",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780927113707229",
+          "summary": "please fix these two recommendation widgets"
+        },
+        {
+          "week": "2026-06-08",
+          "id": "t03",
+          "client": "drhonow",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781019663873919",
+          "summary": "/personalization/reco-widget — need help with a recommendation widget"
+        },
+        {
+          "week": "2026-05-25",
+          "id": "t01",
+          "client": "selkirkcom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779822892936139",
+          "summary": "Selkirk wants recommendations showing multiple products on one card"
+        },
+        {
+          "week": "2026-05-11",
+          "id": "s01",
+          "client": "?",
+          "source": "slack (concise)",
+          "url": "thread p1779283… family",
+          "summary": "reco layout: separate widget per screen width (slider→list) → reco-visual-customization"
+        },
+        {
+          "week": "2026-05-04",
+          "id": "s01",
+          "client": "bokksu",
+          "source": "slack (concise)",
+          "url": "bokksu reco-widget/56999",
+          "summary": "reco mobile layout (all products in one line) → reco-visual-customization"
+        },
+        {
+          "week": "2026-04-27",
+          "id": "s02",
+          "client": "drhonow",
+          "source": null,
+          "url": null,
+          "summary": null
+        },
+        {
+          "week": "2026-04-20",
+          "id": "s01",
+          "client": "?",
+          "source": "slack (concise)",
+          "url": "bundle template / collections reporting",
+          "summary": "bundle template gap + reco report by-collection → reco-visual-customization"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-replace-content-race",
+      "group": "Bug",
+      "story": "Reco A/B replace-content race → empty/flickering widget",
+      "total_tickets": 5,
+      "total_mechanics": 0,
+      "weeks": 4,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t03",
+          "client": "drhonow",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783941155257219",
+          "summary": "\"Alarm — launched many widgets & recommendations, inline blocks\" (drhonow)"
+        },
+        {
+          "week": "2026-07-13",
+          "id": "t09",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784108286481209",
+          "summary": "desktop/mobile: add-to-cart / cart-update on click stopped working"
+        },
+        {
+          "week": "2026-07-06",
+          "id": "t08",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783688232330459",
+          "summary": "\"опять проблема с люси\" (vague — read to classify/drop)"
+        },
+        {
+          "week": "2026-06-22",
+          "id": "t03",
+          "client": "jolyn",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782312749710779",
+          "summary": "launched two new widgets, needs help"
+        },
+        {
+          "week": "2026-04-27",
+          "id": "t02",
+          "client": "lucyandyak",
+          "source": null,
+          "url": null,
+          "summary": null
+        }
+      ]
+    },
+    {
+      "id": "rc-cc-popup-inline-template-gap",
+      "group": "Custom code",
+      "story": "Pop-up / inline-block template gap → hand-authored markup",
+      "total_tickets": 3,
+      "total_mechanics": 476,
+      "weeks": 14,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-05-18",
+          "id": "t01",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779174559077259",
+          "summary": "help with some pop-ups"
+        },
+        {
+          "week": "2026-04-27",
+          "id": "s01",
+          "client": "Foodcycler",
+          "source": null,
+          "url": null,
+          "summary": null
+        },
+        {
+          "week": "2026-04-13",
+          "id": "t01",
+          "client": "almondcow",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1776117907024229",
+          "summary": "look at this popup (almondcow.co/?pm-test-form=…)"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-theme-slot-injection",
+      "group": "Missing feature",
+      "story": "No native theme-aware placement (slot / header / cart drawer)",
+      "total_tickets": 3,
+      "total_mechanics": 45,
+      "weeks": 14,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t08",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784028042696819",
+          "summary": "\"you may also like\" recommendations not working again"
+        },
+        {
+          "week": "2026-06-29",
+          "id": "t01",
+          "client": "zone3",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782813309221179",
+          "summary": "new text bar on Zone3 — \"whole mess getting it placed\""
+        },
+        {
+          "week": "2026-06-08",
+          "id": "t05",
+          "client": "monkeysports",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781186391436609",
+          "summary": "/personalization/reco-w — help hook up the reco widget"
+        }
+      ]
+    },
+    {
+      "id": "rc-cc-no-custom-code-guardrails",
+      "group": "Custom code",
+      "story": "No lint/validation gate on custom code → ships broken",
+      "total_tickets": 3,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t04",
+          "client": "movavicom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783954538310529",
+          "summary": "movavi — error with our tracker/script?"
+        },
+        {
+          "week": "2026-06-29",
+          "id": "t02",
+          "client": "limevizio",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782897255892259",
+          "summary": "blossomflowerdelivery / limevizio flagged an issue (vague — read)"
+        },
+        {
+          "week": "2026-06-29",
+          "id": "t04",
+          "client": "atlantacutlery",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782923957849159",
+          "summary": "setting up / fixing the loyalty widget (/personalization/…)"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-mechanic-limit-visibility",
+      "group": "Missing feature",
+      "story": "Undisclosed reco-mechanic cap, no self-serve visibility",
+      "total_tickets": 3,
+      "total_mechanics": 0,
+      "weeks": 3,
+      "last_seen": "2026-06-22",
+      "threads": [
+        {
+          "week": "2026-06-22",
+          "id": "t02",
+          "client": "jolyn",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782300214210689",
+          "summary": "add a custom recommendation at /recommendations-algorithms"
+        },
+        {
+          "week": "2026-06-01",
+          "id": "t07",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780581321897409",
+          "summary": "/recommendations-algorithms — please add algorithms"
+        },
+        {
+          "week": "2026-04-27",
+          "id": "t05",
+          "client": "jolyn",
+          "source": null,
+          "url": null,
+          "summary": null
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-partial-submission-dropoff",
+      "group": "Bug",
+      "story": "Pop-up partial-submission misses code-confirm dropoff (lost subs)",
+      "total_tickets": 3,
+      "total_mechanics": 0,
+      "weeks": 3,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t12",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784214427144459",
+          "summary": "verification code in popup doesn't work"
+        },
+        {
+          "week": "2026-06-08",
+          "id": "t02",
+          "client": "bedkingdom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780944580726519",
+          "summary": "/personalization/pop-up/57702 — check this pop-up"
+        },
+        {
+          "week": "2026-05-11",
+          "id": "t01",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1778617232749569",
+          "summary": "behavior of our popups in a particular usecase (user input…)"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-variant-dedup",
+      "group": "Missing feature",
+      "story": "Reco widget repeats colour variants (SKU dedup, no swatches, no self-serve)",
+      "total_tickets": 2,
+      "total_mechanics": 194,
+      "weeks": 14,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-06",
+          "id": "t05",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783521312507119",
+          "summary": "lucyayk: лимитировать показ одного варианта для многих групп id"
+        },
+        {
+          "week": "2026-07-06",
+          "id": "t10",
+          "client": "lucyandyak",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1783520425179659?thread_ts=1782911849.751909",
+          "summary": "#csm-support: Lucy&Yak reco quality (duplicate products across a rec, swatches) + signup popup+modal — thread started 06-30, active in-window"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-ab-migration",
+      "group": "Bug",
+      "story": "Migration left A/B config broken",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t14",
+          "client": "betboom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784284564946539",
+          "summary": "betboom /personalization/pop-up/59687"
+        },
+        {
+          "week": "2026-06-29",
+          "id": "t03",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782918270506749",
+          "summary": "error adding an A/B test within the popup creation tool"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-template-upgrade-selfserve",
+      "group": "Missing feature",
+      "story": "No self-serve reco-widget template upgrade / per-device width",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-06-22",
+      "threads": [
+        {
+          "week": "2026-06-22",
+          "id": "t04",
+          "client": "hawaiicoffee",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782324762714079",
+          "summary": "help updating the widget template"
+        },
+        {
+          "week": "2026-06-15",
+          "id": "s01",
+          "client": "hawaiicoffee",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1781719637466469",
+          "summary": "reco widgets on old template — update to new one without rebuilding? (matches W26 t04 cause)"
+        }
+      ]
+    },
+    {
+      "id": "rc-cc-dom-dependent-targeting-breaks",
+      "group": "Custom code",
+      "story": "Custom DOM-matching targeting breaks on client markup changes",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-06-22",
+      "threads": [
+        {
+          "week": "2026-06-22",
+          "id": "t05",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782390851350049",
+          "summary": "/personalization/inline-block/57525 — \"эта срань\" (broken)"
+        },
+        {
+          "week": "2026-06-15",
+          "id": "t02",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781533862203659",
+          "summary": "\"notify in stock\" widget button not working (/personalization/inline)"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-no-variant-data",
+      "group": "Missing feature",
+      "story": "No product variant data for reco widget dropdowns",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-06-22",
+      "threads": [
+        {
+          "week": "2026-06-22",
+          "id": "t07",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782457814996109",
+          "summary": "help with the dropdown variant block in the widget"
+        },
+        {
+          "week": "2026-06-01",
+          "id": "t06",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780567512308009",
+          "summary": "add a second image to a magento product for the widget"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-yotpo-ratings-integration",
+      "group": "Missing feature",
+      "story": "No native Yotpo ratings integration for reco widgets",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "s01",
+          "client": "?",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1784213194210719",
+          "summary": "Okendo reviews integration for reco widget (reviews/ratings into feed, like Yotpo)"
+        },
+        {
+          "week": "2026-06-15",
+          "id": "t03",
+          "client": "drhonow",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781631200716869",
+          "summary": "/personalization/reco-widget/58044 — issue with recommendation widget"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-image-responsive-padding",
+      "group": "Bug",
+      "story": "Popup image padding differs desktop vs mobile",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "t10",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781787520745879",
+          "summary": "trouble when creating popups"
+        },
+        {
+          "week": "2026-04-20",
+          "id": "t04",
+          "client": "4ocean",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1777073188580759",
+          "summary": "/personalization/pop-up/57103/settings [issue]"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-report-assisted-revenue-double-count",
+      "group": "Bug",
+      "story": "Reco BI report double-counts assisted revenue (~3x AOV)",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-06-08",
+      "threads": [
+        {
+          "week": "2026-06-08",
+          "id": "t06",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781256213986689",
+          "summary": "reco widget \"Frequently Bought With\" — PDP add-to-cart button + size selector"
+        },
+        {
+          "week": "2026-06-01",
+          "id": "t03",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780387344597939",
+          "summary": "issue with the Product Recommendations dashboard?"
+        }
+      ]
+    },
+    {
+      "id": "rc-howto-popup-form-config",
+      "group": "How-to",
+      "story": "How-to: pop-up form field config + capture-on-close",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-01",
+      "threads": [
+        {
+          "week": "2026-06-01",
+          "id": "t01",
+          "client": "copenhagenliving",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780320296258729",
+          "summary": "/personalization/... — why can't we collect names in this form"
+        },
+        {
+          "week": "2026-06-01",
+          "id": "t02",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780326565482399",
+          "summary": "help with a pop-up (urgent)"
+        }
+      ]
+    },
+    {
+      "id": "rc-howto-reco-silent-misconfig",
+      "group": "How-to",
+      "story": "How-to: reco widget silently broken when a setting isn't enabled",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-01",
+      "threads": [
+        {
+          "week": "2026-06-01",
+          "id": "t04",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780399163426149",
+          "summary": "/personalization/reco-widget/57719 + test link"
+        },
+        {
+          "week": "2026-06-01",
+          "id": "t09",
+          "client": "sarahssilks",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780611238595579",
+          "summary": "help with this widget"
+        }
+      ]
+    },
+    {
+      "id": "rc-cc-legacy-tracker-per-theme-layout",
+      "group": "Custom code",
+      "story": "Legacy manual tracker install fails per theme layout / after rename",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 2,
+      "last_seen": "2026-05-11",
+      "threads": [
+        {
+          "week": "2026-05-11",
+          "id": "t02",
+          "client": "lectricebikes",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1778679483273429",
+          "summary": "/personalization/ — why this product rec [issue]"
+        },
+        {
+          "week": "2026-05-04",
+          "id": "t01",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1777916350950869",
+          "summary": "popup preview not loading"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-variant-availability-filter",
+      "group": "Missing feature",
+      "story": "As a merchandiser/CSM, my reco widget recommends out-of-stock or unpublished var",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t05",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783957670801839",
+          "summary": "reco variants show out-of-stock products (lucyandyak)"
+        },
+        {
+          "week": "2026-07-13",
+          "id": "t06",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784021823125099",
+          "summary": "new ticket: product availability in reco (lucy, client-side stock)"
+        }
+      ]
+    },
+    {
+      "id": "rc-cc-popup-integration-ops",
+      "group": "Custom code",
+      "story": "Integration JS for API ops, add-to-cart, form handling",
+      "total_tickets": 1,
+      "total_mechanics": 211,
+      "weeks": 14,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-05-18",
+          "id": "t02",
+          "client": "idaka",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779282870874029",
+          "summary": "/personalization/... — look at this widget for Idaka golf"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-popup-per-customer-promocode",
+      "group": "Missing feature",
+      "story": "Pop-up can’t show a per-customer promo code",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-07-06",
+      "threads": [
+        {
+          "week": "2026-07-06",
+          "id": "t04",
+          "client": "zone3",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783520462864959",
+          "summary": "Zone3: show a unique promo code per customer on final pop-up screen (\"not possible right now\")"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-single-algo-per-slot",
+      "group": "Missing feature",
+      "story": "Reco widget limited to one algorithm per slot",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-29",
+      "threads": [
+        {
+          "week": "2026-06-29",
+          "id": "t05",
+          "client": "selkirkcom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782927686071299",
+          "summary": "add a second \"Post-purchase cross-sell\" algorithm for Selkirk"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-targeting-reach-api-triggered",
+      "group": "Bug",
+      "story": "Targeting reach = 0 for API-triggered widgets",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-29",
+      "threads": [
+        {
+          "week": "2026-06-29",
+          "id": "t09",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783020863858259",
+          "summary": "product matcher UI updates broke something"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-editor-unsaved-guard",
+      "group": "Bug",
+      "story": "Pop-up editor lost unsaved edits (fixed MR !8819)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-29",
+      "threads": [
+        {
+          "week": "2026-06-29",
+          "id": "t07",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783010541696629",
+          "summary": "pop-up didn't save after creating a teaser"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-widget-copy-perf",
+      "group": "Bug",
+      "story": "Reco-widget copy slow / errors",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-07-06",
+      "threads": [
+        {
+          "week": "2026-07-06",
+          "id": "t03",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783414698568809",
+          "summary": "Unable to copy the widgets"
+        }
+      ]
+    },
+    {
+      "id": "rc-cc-client-owned-js-breaks-reco",
+      "group": "Custom code",
+      "story": "Client-owned custom JS zeroes reco eligibility",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-07-06",
+      "threads": [
+        {
+          "week": "2026-07-06",
+          "id": "t06",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783588274253819",
+          "summary": "Не работают рекомендации на проекте"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-sms-auth-intermittent",
+      "group": "Bug",
+      "story": "Pop-up SMS auth code intermittently failed",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-29",
+      "threads": [
+        {
+          "week": "2026-06-29",
+          "id": "t08",
+          "client": "coolibar",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1783020763145839",
+          "summary": "/personalization/pop-up/58478 — tested new pop-up with authorization…"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-computed-props-custom-event-fields",
+      "group": "Missing feature",
+      "story": "Computed properties can't aggregate custom event fields",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-22",
+      "threads": [
+        {
+          "week": "2026-06-22",
+          "id": "t01",
+          "client": "Aiby",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782232239138659",
+          "summary": "wants personalized pushes/emails based on favorite category (feature request)"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-popup-lead-dropped-phone-collision",
+      "group": "Missing feature",
+      "story": "Lead-gen pop-up silently drops submissions on phone collision",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-22",
+      "threads": [
+        {
+          "week": "2026-06-22",
+          "id": "t06",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1782422545098389",
+          "summary": "what happens to user information on lead (forms/lead capture)"
+        }
+      ]
+    },
+    {
+      "id": "rc-howto-reco-preset-purchased-exclusion",
+      "group": "How-to",
+      "story": "How-to: which reco presets exclude already-purchased products",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-22",
+      "threads": [
+        {
+          "week": "2026-06-22",
+          "id": "s01",
+          "client": null,
+          "source": null,
+          "url": null,
+          "summary": null
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-phone-format-validation",
+      "group": "Bug",
+      "story": "Phone-format validation missing countries (fixed GH #1071)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "t01",
+          "client": "hoeglcom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781520809482949",
+          "summary": "/personalization/inline — phone-format issue in the form"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-checkout-reco-settings-ignored",
+      "group": "Bug",
+      "story": "Checkout reco widget settings ignored (Shopify-side)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "t04",
+          "client": "deako",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781632505762839",
+          "summary": "/personalization/reco-widget/55732 — checkout recommendations"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-geotargeting-exclusion-ignored",
+      "group": "Bug",
+      "story": "Geotargeting country-exclusion ignored (fixed)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "t05",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781636585061709",
+          "summary": "issue with geotargeting?"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-carousel-mobile-device",
+      "group": "Bug",
+      "story": "Reco carousel breaks on specific Android devices",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "t06",
+          "client": "zone3",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781675187671859",
+          "summary": "/personalization/reco-widget/55349 — take a look at this widget"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-rotation-perf-under-load",
+      "group": "Bug",
+      "story": "Popup rotation degrades under traffic surge",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "t07",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781705863336709",
+          "summary": "pop-ups working badly"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-per-device-placement-selector",
+      "group": "Missing feature",
+      "story": "No per-device CSS selector for widget placement",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "t08",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781783500007889",
+          "summary": "log an improvement for personalization / recommendations"
+        }
+      ]
+    },
+    {
+      "id": "rc-cc-editor-no-script-tag",
+      "group": "Custom code",
+      "story": "Custom-code editor rejects <script> tags",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "t09",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781784276205999",
+          "summary": "\"did we do something with popups?\" (vague)"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-bundle-discount-on-add",
+      "group": "Missing feature",
+      "story": "Bundle reco: no discount-only-when-added-from-rec",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-15",
+      "threads": [
+        {
+          "week": "2026-06-15",
+          "id": "s02",
+          "client": "?",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1781790498832899",
+          "summary": "bundle setup like Rebuy (select products added together); note: can't do discount only-when-added-from-rec"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-image-optimization",
+      "group": "Missing feature",
+      "story": "Reco image optimization all-or-nothing (slow vs low quality)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-08",
+      "threads": [
+        {
+          "week": "2026-06-08",
+          "id": "t04",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1781099438076139",
+          "summary": "is there a backlog for reco improvements I can add to?"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-shopify-two-way-sync",
+      "group": "Missing feature",
+      "story": "No two-way sync of pop-up/segment data to Shopify",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-08",
+      "threads": [
+        {
+          "week": "2026-06-08",
+          "id": "s02",
+          "client": "?",
+          "source": "slack",
+          "url": "https://maestraio.slack.com/archives/C089G0JMXJP/p1781207700826419",
+          "summary": "Shopify integration/capabilities: pop-up→Shopify sync, segments, account-portal customization"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-editor-hidden-field",
+      "group": "Bug",
+      "story": "Pop-up editor hides name field → stuck placeholder in live pop-up",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-01",
+      "threads": [
+        {
+          "week": "2026-06-01",
+          "id": "t05",
+          "client": "natvbasics",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780417106343099",
+          "summary": "/personalization/pop-up/56874/settings"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-variant-selector-broken",
+      "group": "Bug",
+      "story": "Checkout reco variant selector / product name not rendering",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-01",
+      "threads": [
+        {
+          "week": "2026-06-01",
+          "id": "t08",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780582938116049",
+          "summary": "variant selection not working in both widgets"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-update-pipeline-stuck",
+      "group": "Bug",
+      "story": "Reco update pipeline stuck (stale items, no alerting)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-06-01",
+      "threads": [
+        {
+          "week": "2026-06-01",
+          "id": "t10",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1780697348797889",
+          "summary": "product recommendations stuck in \"updating\" ~1.5h"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-zero-weight-algo-op",
+      "group": "Bug",
+      "story": "Reco op called even when algorithm weight = 0 (failed ops)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-05-25",
+      "threads": [
+        {
+          "week": "2026-05-25",
+          "id": "t02",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779870162822599",
+          "summary": "strange operation popmechanic-widget-55454-reco-2 + errors"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-min-count-selector-embed",
+      "group": "Bug",
+      "story": "Reco min-product-count hide broken on selector-embed",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-05-25",
+      "threads": [
+        {
+          "week": "2026-05-25",
+          "id": "t03",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779874030094519",
+          "summary": "why can('t) my client see the widget"
+        }
+      ]
+    },
+    {
+      "id": "rc-howto-reco-ab-participant-counting",
+      "group": "How-to",
+      "story": "How-to: reco A/B participant counting (eligibility vs render)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-05-25",
+      "threads": [
+        {
+          "week": "2026-05-25",
+          "id": "t04",
+          "client": "lectricebikes",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1779994668165949",
+          "summary": "A/B tests & reporting question for a reco A/B test"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-heading-textarea-regression",
+      "group": "Bug",
+      "story": "Pop-up heading text→textarea change broke all pop-ups",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-05-04",
+      "threads": [
+        {
+          "week": "2026-05-04",
+          "id": "t02",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1777989733637179",
+          "summary": "using heading section to place custom HTML on popups (feature/request)"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-custom-js-vanishes",
+      "group": "Bug",
+      "story": "Reco widget custom JS silently vanishes (no audit log)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-05-04",
+      "threads": [
+        {
+          "week": "2026-05-04",
+          "id": "t03",
+          "client": "zone3",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1778041691240399",
+          "summary": "investigate what went wrong with this widget"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-widget-load-latency",
+      "group": "Bug",
+      "story": "Reco widget backend load latency (slow CDP lookups)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-05-04",
+      "threads": [
+        {
+          "week": "2026-05-04",
+          "id": "t04",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1778148224450769",
+          "summary": "speed up loading of our recommendations widget"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-popup-regional-render",
+      "group": "Bug",
+      "story": "Pop-up regional rendering bug",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-04-27",
+      "threads": [
+        {
+          "week": "2026-04-27",
+          "id": "t01",
+          "client": "doraihome",
+          "source": null,
+          "url": null,
+          "summary": null
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-ranking-opacity-tuning",
+      "group": "Missing feature",
+      "story": "Reco ranking opaque + popularity lookback not tunable",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-04-27",
+      "threads": [
+        {
+          "week": "2026-04-27",
+          "id": "t03",
+          "client": "Jolyn",
+          "source": null,
+          "url": null,
+          "summary": null
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-reco-preview-hash-missing",
+      "group": "Bug",
+      "story": "Reco preview settings hash unresolvable in DB",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-04-27",
+      "threads": [
+        {
+          "week": "2026-04-27",
+          "id": "t04",
+          "client": "sena",
+          "source": null,
+          "url": null,
+          "summary": null
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-inline-block-form-localization-missing",
+      "group": "Bug",
+      "story": "Inline-block settings form missing localization",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-04-20",
+      "threads": [
+        {
+          "week": "2026-04-20",
+          "id": "t02",
+          "client": "natvbasics",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1776907859054669",
+          "summary": "/personalization/inline-block/57047/settings [issue]"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-reco-explicit-cart-rules",
+      "group": "Missing feature",
+      "story": "No explicit cart-based reco rules + fallback",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-04-20",
+      "threads": [
+        {
+          "week": "2026-04-20",
+          "id": "t03",
+          "client": "selkirkcom",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1777064833857289",
+          "summary": "product recs for Selkirk — they'd like to create [something]"
+        }
+      ]
+    },
+    {
+      "id": "rc-mf-subscription-source-attribution",
+      "group": "Missing feature",
+      "story": "No subscription-source attribution (pop-up vs registration)",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-04-13",
+      "threads": [
+        {
+          "week": "2026-04-13",
+          "id": "t02",
+          "client": "Jolyn",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1776262404895879",
+          "summary": "confirm there's really no way to see a subscription's source"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-feed-invalid-char-rejection",
+      "group": "Bug",
+      "story": "As a client syncing a product feed, a single invisible/zero-width unicode charac",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t07",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784022710000989",
+          "summary": "US product feed not loading for lucy"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-inapp-redirect-not-firing",
+      "group": "Bug",
+      "story": "As a client, customers who click an in-app message's CTA aren't taken to the con",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t11",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784193387998739",
+          "summary": "\"take a look at this in-app\" (in-app/inline message)"
+        }
+      ]
+    },
+    {
+      "id": "rc-bug-legacy-feed-ownership-stale",
+      "group": "Bug",
+      "story": "As a CSM troubleshooting a legacy client, the product feed is stale with no clea",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t13",
+          "client": "?",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784279899455249",
+          "summary": "product feed broken — not updating"
+        }
+      ]
+    },
+    {
+      "id": "rc-howto-targeting-custom-field-audience",
+      "group": "How-to",
+      "story": "As a CSM, I need a zone/region audience filter but only found a distance-radius ",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "weeks": 1,
+      "last_seen": "2026-07-13",
+      "threads": [
+        {
+          "week": "2026-07-13",
+          "id": "t10",
+          "client": "lucyandyak",
+          "source": "clearfeed",
+          "url": "https://maestraio.slack.com/archives/C08FEDXGQUC/p1784113403113449",
+          "summary": "enable filter by custom-field zones for lucy (targeting)"
+        }
+      ]
+    },
+    {
+      "id": "rc-cc-targeting-gtm-gating",
+      "group": "Custom code",
+      "story": "Custom JS targeting (GTM/consent, language, currency, delay, hours)",
+      "total_tickets": 0,
+      "total_mechanics": 206,
+      "weeks": 14,
+      "last_seen": "2026-07-13",
+      "threads": []
+    }
+  ]
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<script>
+const DATA = JSON.parse(document.getElementById("toil-data").textContent);
+const COLORS = { "Bug":"#a32d2d", "New client setup":"#185fa5", "Missing feature":"#534ab7", "Custom code":"#0f6e56", "How-to":"#b26a00" };
+const PILL = { "Bug":"Bug", "New client setup":"setup", "Missing feature":"missing", "Custom code":"custom", "How-to":"howto" };
+const app = document.getElementById("app");
+
+document.getElementById("subline").textContent =
+  `Weekly (Mon–Sun) toil + custom-code tracker · omega shard (lower bound)` +
+  (DATA.updated ? ` · updated ${DATA.updated}` : "");
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+let CHART = null;
+
+if (!DATA.windows.length) {
+  app.innerHTML = `<div class="empty">No weeks recorded yet.<br>Run <code>/support-analysis &lt;week&gt;</code> to populate the first Mon–Sun window.</div>`;
+} else {
+  renderCards();
+  renderChart();
+  renderWeekDetail(DATA.windows.length - 1); // default to latest week
+  renderRecurring();
+}
+document.getElementById("foot").innerHTML =
+  `Sources: ClearFeed collection 4 (product-support) · Slack #csm-support · omega DB (single shard → custom-code counts are a lower bound). ` +
+  `Windows are comparable only while sources, queries, and group definitions stay fixed.`;
+
+function renderCards() {
+  const w = DATA.windows[DATA.windows.length - 1];
+  const s = w.support || {};
+  const groupBits = DATA.groups.map(g => `${g.split(" ")[0]} ${s[g] || 0}`).join(" · ");
+  const cc = w.customCode || {};
+  const cards = [
+    { label: `Latest week (${w.range})`, value: w.supportTickets ?? 0, note: "support tickets" },
+    { label: "By group", value: "", note: groupBits },
+    { label: "Custom-code mechanics", value: cc.total ?? 0, note: `omega lower bound · html/css ${cc.htmlcss||0} · tgt ${cc.targeting||0} · int ${cc.integration||0}` },
+    { label: "Recurring causes", value: (DATA.recurring||[]).length, note: `across ${DATA.windows.length} week(s)` },
+  ];
+  app.insertAdjacentHTML("beforeend",
+    `<div class="cards">` + cards.map(c =>
+      `<div class="card"><div class="label">${c.label}</div>` +
+      (c.value !== "" ? `<div class="value">${c.value}</div>` : ``) +
+      `<div class="note">${c.note}</div></div>`).join("") + `</div>`);
+}
+
+function renderChart() {
+  app.insertAdjacentHTML("beforeend",
+    `<h2>Weekly toil by root-cause group</h2>` +
+    `<div class="legend">` +
+      DATA.groups.map(g => `<span><i class="sw" style="background:${COLORS[g]}"></i>${g}</span>`).join("") +
+      `<span><i class="sw" style="background:#c9a227"></i>Custom-code mechanics (line, right axis)</span>` +
+    `</div><div class="chartwrap"><canvas id="chart"></canvas></div>` +
+    `<p class="hint">Click a week to see its tickets ↓</p>` +
+    `<div id="weekdetail"></div>`);
+  const labels = DATA.windows.map(w => w.range || w.week);
+  const barSets = DATA.groups.map(g => ({
+    type: "bar",
+    label: g, data: DATA.windows.map(w => (w.support && w.support[g]) || 0),
+    backgroundColor: COLORS[g], stack: "toil", borderWidth: 0,
+  }));
+  const line = {
+    label: "Custom-code mechanics", type: "line", yAxisID: "y2",
+    data: DATA.windows.map(w => (w.customCode && w.customCode.total) || 0),
+    borderColor: "#c9a227", backgroundColor: "#c9a227", tension: 0.25, pointRadius: 3,
+  };
+  const canvas = document.getElementById("chart");
+  CHART = new Chart(canvas, {
+    data: { labels, datasets: [...barSets, line] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      onClick: (evt) => {
+        const pts = CHART.getElementsAtEventForMode(evt, "index", { intersect: false }, true);
+        if (pts.length) renderWeekDetail(pts[0].index);
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, title: { display: true, text: "support tickets" } },
+        y2: { position: "right", beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: "mechanics" } },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
+}
+
+function renderWeekDetail(index) {
+  const w = DATA.windows[index];
+  const el = document.getElementById("weekdetail");
+  if (!w || !el) return;
+  const s = w.support || {};
+  const groupBits = DATA.groups.filter(g => s[g]).map(g =>
+    `<span class="pill ${PILL[g]||''}">${g} ${s[g]}</span>`).join(" ");
+  const cc = w.customCode || {};
+  const rows = (w.entries || []).map(e => {
+    const link = e.url
+      ? `<a class="thread-link" href="${esc(e.url)}" target="_blank" rel="noopener">thread</a>`
+      : `<span class="no-link">no link</span>`;
+    const desc = e.summary || e.causeStory || "";
+    return `<tr>` +
+      `<td><span class="pill ${PILL[e.group]||''}">${esc(e.group||"")}</span></td>` +
+      `<td>${esc(e.client||"?")}</td>` +
+      `<td>${esc(desc)}${e.summary && e.causeStory ? `<div class="cause">↳ ${esc(e.causeStory)}</div>` : ""}</td>` +
+      `<td class="n">${link}</td></tr>`;
+  }).join("");
+  el.innerHTML =
+    `<div class="wk">` +
+      `<div class="wk-head"><span class="wk-title">${esc(w.range)}</span>` +
+      `<span class="wk-meta">${esc(w.iso)} · ${w.supportTickets||0} support tickets</span>` +
+      `<span>${groupBits}</span></div>` +
+      `<div class="wk-cc">Custom-code mechanics: ${cc.total||0} (omega lower bound · html/css ${cc.htmlcss||0} · targeting ${cc.targeting||0} · integration ${cc.integration||0})</div>` +
+      (rows
+        ? `<table><thead><tr><th>Group</th><th>Client</th><th>Ticket / root cause</th><th class="n">Link</th></tr></thead><tbody>${rows}</tbody></table>`
+        : `<p class="no-link">No individual support threads recorded for this week.</p>`) +
+    `</div>`;
+}
+
+function renderRecurring() {
+  const rec = (DATA.recurring || []).slice().sort((a,b) =>
+    (b.total_tickets - a.total_tickets) || ((b.total_mechanics||0) - (a.total_mechanics||0)));
+  if (!rec.length) return;
+  const body = rec.map((r, i) => {
+    const threads = r.threads || [];
+    const has = threads.length > 0;
+    const items = threads.map(t => {
+      const label = t.summary || t.id || "";
+      const inner = t.url
+        ? `<a class="thread-link" href="${esc(t.url)}" target="_blank" rel="noopener">${esc(label)}</a>`
+        : `${esc(label)} <span class="no-link">(no link)</span>`;
+      return `<li><span class="wk-tag">${esc(t.week)}</span> ${esc(t.client||"?")} — ${inner}</li>`;
+    }).join("");
+    const main =
+      `<tr class="rc-row${has ? " has-threads" : ""}" data-i="${i}">` +
+      `<td>${has ? `<span class="rc-toggle">▸</span>` : `<span class="rc-toggle"></span>`}${esc(r.story || r.id)}</td>` +
+      `<td><span class="pill ${PILL[r.group]||''}">${esc(r.group||"")}</span></td>` +
+      `<td class="n">${r.total_tickets}</td><td class="n">${r.total_mechanics||0}</td>` +
+      `<td class="n">${r.weeks}</td><td class="n">${esc(r.last_seen||"")}</td></tr>`;
+    const detail = has
+      ? `<tr class="rc-threads" data-for="${i}" hidden><td colspan="6"><div class="box"><ul>${items}</ul></div></td></tr>`
+      : "";
+    return main + detail;
+  }).join("");
+  app.insertAdjacentHTML("beforeend",
+    `<h2>Recurring root causes (accumulated)</h2>` +
+    `<p style="font-size:11.5px;color:var(--muted);margin:0 0 8px">Tickets = support contacts. Mechanics = omega custom-code mechanics (lower bound; counts overlap across custom-code causes). Click a row to see its threads.</p>` +
+    `<table><thead><tr><th>Root cause</th><th>Group</th><th class="n">Tickets</th><th class="n">Mechanics</th><th class="n">Weeks</th><th class="n">Last seen</th></tr></thead><tbody>` +
+    body + `</tbody></table>`);
+  app.querySelectorAll("tr.rc-row.has-threads").forEach(row => {
+    row.addEventListener("click", () => {
+      const i = row.getAttribute("data-i");
+      const det = app.querySelector(`tr.rc-threads[data-for="${i}"]`);
+      const open = det.hasAttribute("hidden");
+      if (open) det.removeAttribute("hidden"); else det.setAttribute("hidden", "");
+      row.classList.toggle("open", open);
+    });
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2463 @@
+{
+  "schemaVersion": 2,
+  "note": "Accumulated root-cause registry across weekly windows. Written by stage 30 of /support-analysis. Occurrences carry BOTH ticket evidence (support threads) and mechanic evidence (omega custom-code mechanics, lower bound). Per-cause `mechanics` counts OVERLAP across custom-code causes (a mechanic can exhibit several patterns) — use `custom_code_totals` per window for exact non-overlapping figures.",
+  "custom_code_totals": [
+    {
+      "window": "2026-04-13",
+      "distinct": 44,
+      "htmlcss": 40,
+      "targeting": 7,
+      "integration": 12,
+      "created_in_window": 61,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-04-20",
+      "distinct": 52,
+      "htmlcss": 51,
+      "targeting": 5,
+      "integration": 16,
+      "created_in_window": 79,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-04-27",
+      "distinct": 62,
+      "htmlcss": 59,
+      "targeting": 25,
+      "integration": 13,
+      "created_in_window": 69,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-05-04",
+      "distinct": 68,
+      "htmlcss": 68,
+      "targeting": 24,
+      "integration": 5,
+      "created_in_window": 118,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-05-11",
+      "distinct": 91,
+      "htmlcss": 88,
+      "targeting": 28,
+      "integration": 35,
+      "created_in_window": 115,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-05-18",
+      "distinct": 59,
+      "htmlcss": 53,
+      "targeting": 9,
+      "integration": 18,
+      "created_in_window": 75,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-05-25",
+      "distinct": 43,
+      "htmlcss": 40,
+      "targeting": 16,
+      "integration": 13,
+      "created_in_window": 130,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-06-01",
+      "distinct": 70,
+      "htmlcss": 68,
+      "targeting": 17,
+      "integration": 17,
+      "created_in_window": 80,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-06-08",
+      "distinct": 56,
+      "htmlcss": 53,
+      "targeting": 12,
+      "integration": 12,
+      "created_in_window": 75,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-06-15",
+      "distinct": 64,
+      "htmlcss": 59,
+      "targeting": 8,
+      "integration": 18,
+      "created_in_window": 100,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-06-22",
+      "distinct": 95,
+      "htmlcss": 94,
+      "targeting": 19,
+      "integration": 26,
+      "created_in_window": 118,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-06-29",
+      "distinct": 63,
+      "htmlcss": 62,
+      "targeting": 16,
+      "integration": 11,
+      "created_in_window": 77,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-07-06",
+      "distinct": 60,
+      "htmlcss": 58,
+      "targeting": 8,
+      "integration": 10,
+      "created_in_window": 83,
+      "shard": "omega (lower bound)"
+    },
+    {
+      "window": "2026-07-13",
+      "distinct": 69,
+      "htmlcss": 68,
+      "targeting": 12,
+      "integration": 21,
+      "created_in_window": 88,
+      "shard": "omega (lower bound)"
+    }
+  ],
+  "root_causes": [
+    {
+      "id": "rc-mf-reco-variant-dedup",
+      "group": "Missing feature",
+      "kind": "both",
+      "story": "As a CSM managing reco widgets, recommendation lists repeat the same product once per colour because dedup happens at SKU level (Shopify feeds assign a distinct group id per colour variant) and there is no native swatch rendering or self-serve, account-wide dedupe — so the only fix is hand-coded per widget.",
+      "current_solution": "Manual per-widget 'recommendations custom sorting' rule (covers one widget/channel only); broader fix hand-coded. Same pattern seen with Jolyn.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak",
+        "jolyn",
+        "zone3",
+        "BlueQ",
+        "hawaiicoffee",
+        "SvahaUSA",
+        "Sena",
+        "Allegianteyewear",
+        "bokksu",
+        "Deako",
+        "drhonow"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-13",
+          "tickets": 0,
+          "mechanics": 6,
+          "entries": [
+            "windows/2026-04-13/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-20",
+          "tickets": 0,
+          "mechanics": 13,
+          "entries": [
+            "windows/2026-04-20/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-27",
+          "tickets": 0,
+          "mechanics": 5,
+          "entries": [
+            "windows/2026-04-27/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-04",
+          "tickets": 0,
+          "mechanics": 7,
+          "entries": [
+            "windows/2026-05-04/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-11",
+          "tickets": 0,
+          "mechanics": 24,
+          "entries": [
+            "windows/2026-05-11/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-18",
+          "tickets": 0,
+          "mechanics": 4,
+          "entries": [
+            "windows/2026-05-18/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-25",
+          "tickets": 0,
+          "mechanics": 6,
+          "entries": [
+            "windows/2026-05-25/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-01",
+          "tickets": 0,
+          "mechanics": 21,
+          "entries": [
+            "windows/2026-06-01/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-08",
+          "tickets": 0,
+          "mechanics": 17,
+          "entries": [
+            "windows/2026-06-08/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-15",
+          "tickets": 0,
+          "mechanics": 16,
+          "entries": [
+            "windows/2026-06-15/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 0,
+          "mechanics": 23,
+          "entries": [
+            "windows/2026-06-22/enriched.md#cc-a"
+          ]
+        },
+        {
+          "window": "2026-06-29",
+          "tickets": 0,
+          "mechanics": 10,
+          "entries": [
+            "windows/2026-06-29/enriched.md#cc-a"
+          ]
+        },
+        {
+          "window": "2026-07-06",
+          "tickets": 2,
+          "mechanics": 26,
+          "entries": [
+            "windows/2026-07-06/enriched.md#t05",
+            "windows/2026-07-06/enriched.md#t10",
+            "windows/2026-07-06/enriched.md#cc-a"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 0,
+          "mechanics": 16,
+          "entries": [
+            "windows/2026-07-13/enriched.md#cc"
+          ]
+        }
+      ],
+      "total_tickets": 2,
+      "total_mechanics": 194,
+      "first_seen": "2026-04-13",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-cc-popup-inline-template-gap",
+      "group": "Custom code",
+      "kind": "custom-code",
+      "story": "As a CSM, the pop-up / inline-block template library doesn't cover the design the client wants, so I hand-author variant HTML/CSS. The broad, long-tail baseline of custom-code toil.",
+      "current_solution": "Hand-authored variant html/css per mechanic.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Foodcycler",
+        "SvahaUSA",
+        "betboom",
+        "audiogon",
+        "Onethrive",
+        "1winstore",
+        "BookDepot",
+        "BlueQ",
+        "Movavicom"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-13",
+          "tickets": 1,
+          "mechanics": 27,
+          "entries": [
+            "windows/2026-04-13/enriched.md#t01"
+          ]
+        },
+        {
+          "window": "2026-04-20",
+          "tickets": 0,
+          "mechanics": 33,
+          "entries": [
+            "windows/2026-04-20/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-27",
+          "tickets": 1,
+          "mechanics": 29,
+          "entries": [
+            "windows/2026-04-27/enriched.md#s01"
+          ]
+        },
+        {
+          "window": "2026-05-04",
+          "tickets": 0,
+          "mechanics": 37,
+          "entries": [
+            "windows/2026-05-04/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-11",
+          "tickets": 0,
+          "mechanics": 36,
+          "entries": [
+            "windows/2026-05-11/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-18",
+          "tickets": 1,
+          "mechanics": 40,
+          "entries": [
+            "windows/2026-05-18/enriched.md#t01"
+          ]
+        },
+        {
+          "window": "2026-05-25",
+          "tickets": 0,
+          "mechanics": 21,
+          "entries": [
+            "windows/2026-05-25/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-01",
+          "tickets": 0,
+          "mechanics": 30,
+          "entries": [
+            "windows/2026-06-01/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-08",
+          "tickets": 0,
+          "mechanics": 24,
+          "entries": [
+            "windows/2026-06-08/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-15",
+          "tickets": 0,
+          "mechanics": 35,
+          "entries": [
+            "windows/2026-06-15/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 0,
+          "mechanics": 52,
+          "entries": [
+            "windows/2026-06-22/enriched.md#cc-e"
+          ]
+        },
+        {
+          "window": "2026-06-29",
+          "tickets": 0,
+          "mechanics": 36,
+          "entries": [
+            "windows/2026-06-29/enriched.md#cc-e"
+          ]
+        },
+        {
+          "window": "2026-07-06",
+          "tickets": 0,
+          "mechanics": 24,
+          "entries": [
+            "windows/2026-07-06/enriched.md#cc-e"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 0,
+          "mechanics": 52,
+          "entries": [
+            "windows/2026-07-13/enriched.md#cc"
+          ]
+        }
+      ],
+      "total_tickets": 3,
+      "total_mechanics": 476,
+      "first_seen": "2026-04-13",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-cc-targeting-gtm-gating",
+      "group": "Custom code",
+      "kind": "custom-code",
+      "story": "As a CSM, I need display gated on conditions the targeting UI can't express — GTM/consent flags, page language, Shopify currency/locale, a time delay, or business-hours/timezone — so I add a custom $exec JS targeting rule and repeat it across the client's mechanics.",
+      "current_solution": "Custom JS targeting rules ($exec) copied across mechanics: GTM gating (isPopupAllowed), language (lang.startsWith), business-hours windows.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "marathonbet-eu",
+        "Movavicom",
+        "Clientsen",
+        "Jolyn",
+        "BlueQ"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-13",
+          "tickets": 0,
+          "mechanics": 7,
+          "entries": [
+            "windows/2026-04-13/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-20",
+          "tickets": 0,
+          "mechanics": 5,
+          "entries": [
+            "windows/2026-04-20/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-27",
+          "tickets": 0,
+          "mechanics": 25,
+          "entries": [
+            "windows/2026-04-27/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-04",
+          "tickets": 0,
+          "mechanics": 24,
+          "entries": [
+            "windows/2026-05-04/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-11",
+          "tickets": 0,
+          "mechanics": 28,
+          "entries": [
+            "windows/2026-05-11/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-18",
+          "tickets": 0,
+          "mechanics": 9,
+          "entries": [
+            "windows/2026-05-18/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-25",
+          "tickets": 0,
+          "mechanics": 16,
+          "entries": [
+            "windows/2026-05-25/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-01",
+          "tickets": 0,
+          "mechanics": 17,
+          "entries": [
+            "windows/2026-06-01/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-08",
+          "tickets": 0,
+          "mechanics": 12,
+          "entries": [
+            "windows/2026-06-08/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-15",
+          "tickets": 0,
+          "mechanics": 8,
+          "entries": [
+            "windows/2026-06-15/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 0,
+          "mechanics": 19,
+          "entries": [
+            "windows/2026-06-22/enriched.md#cc-b"
+          ]
+        },
+        {
+          "window": "2026-06-29",
+          "tickets": 0,
+          "mechanics": 16,
+          "entries": [
+            "windows/2026-06-29/enriched.md#cc-b"
+          ]
+        },
+        {
+          "window": "2026-07-06",
+          "tickets": 0,
+          "mechanics": 8,
+          "entries": [
+            "windows/2026-07-06/enriched.md#cc-b"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 0,
+          "mechanics": 12,
+          "entries": [
+            "windows/2026-07-13/enriched.md#cc"
+          ]
+        }
+      ],
+      "total_tickets": 0,
+      "total_mechanics": 206,
+      "first_seen": "2026-04-13",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-cc-popup-integration-ops",
+      "group": "Custom code",
+      "kind": "custom-code",
+      "story": "As a CSM, pop-ups/widgets need to call Maestra/Shopify operations (referral capture, personalize-by-name, add-to-cart, product-title capture, localization, click handling) that aren't built-in actions, so I hand-write integration JS.",
+      "current_solution": "Hand-written on_render/on_show/on_success integration JS per mechanic.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Lucyandyak",
+        "BlueQ",
+        "Limevizio",
+        "sarahssilks",
+        "AlmondCow",
+        "drhonow",
+        "bokksu"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-13",
+          "tickets": 0,
+          "mechanics": 12,
+          "entries": [
+            "windows/2026-04-13/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-20",
+          "tickets": 0,
+          "mechanics": 16,
+          "entries": [
+            "windows/2026-04-20/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-27",
+          "tickets": 0,
+          "mechanics": 13,
+          "entries": [
+            "windows/2026-04-27/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-04",
+          "tickets": 0,
+          "mechanics": 5,
+          "entries": [
+            "windows/2026-05-04/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-11",
+          "tickets": 0,
+          "mechanics": 35,
+          "entries": [
+            "windows/2026-05-11/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-18",
+          "tickets": 1,
+          "mechanics": 18,
+          "entries": [
+            "windows/2026-05-18/enriched.md#t02"
+          ]
+        },
+        {
+          "window": "2026-05-25",
+          "tickets": 0,
+          "mechanics": 13,
+          "entries": [
+            "windows/2026-05-25/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-01",
+          "tickets": 0,
+          "mechanics": 17,
+          "entries": [
+            "windows/2026-06-01/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-08",
+          "tickets": 0,
+          "mechanics": 12,
+          "entries": [
+            "windows/2026-06-08/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-15",
+          "tickets": 0,
+          "mechanics": 18,
+          "entries": [
+            "windows/2026-06-15/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 0,
+          "mechanics": 18,
+          "entries": [
+            "windows/2026-06-22/enriched.md#cc-d"
+          ]
+        },
+        {
+          "window": "2026-06-29",
+          "tickets": 0,
+          "mechanics": 7,
+          "entries": [
+            "windows/2026-06-29/enriched.md#cc-d"
+          ]
+        },
+        {
+          "window": "2026-07-06",
+          "tickets": 0,
+          "mechanics": 6,
+          "entries": [
+            "windows/2026-07-06/enriched.md#cc-d"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 0,
+          "mechanics": 21,
+          "entries": [
+            "windows/2026-07-13/enriched.md#cc"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 211,
+      "first_seen": "2026-04-13",
+      "last_seen": "2026-07-13",
+      "notes": "mechanics overlap the html/css clusters."
+    },
+    {
+      "id": "rc-mf-reco-theme-slot-injection",
+      "group": "Missing feature",
+      "kind": "both",
+      "story": "As a CSM, there is no native, theme-aware way to place or lay out a personalization block/widget in a client's site (Shopify theme section, cart drawer, header) — so placement and layout fixes require hand-written DOM-injection JS or CSS tuning per theme.",
+      "current_solution": "Integration JS (on_render/on_show) that manipulates the theme DOM (inject into shopify-section/minicart/related-products; fix header position; destroy mobile slider); or a support engineer hand-editing CSS margins.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "zone3",
+        "Deako",
+        "drhonow",
+        "Lucyandyak",
+        "urbanarmorgear",
+        "CopenhagenLiving",
+        "monkeysports",
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-13",
+          "tickets": 0,
+          "mechanics": 2,
+          "entries": [
+            "windows/2026-04-13/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-20",
+          "tickets": 0,
+          "mechanics": 2,
+          "entries": [
+            "windows/2026-04-20/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-04-27",
+          "tickets": 0,
+          "mechanics": 2,
+          "entries": [
+            "windows/2026-04-27/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-04",
+          "tickets": 0,
+          "mechanics": 2,
+          "entries": [
+            "windows/2026-05-04/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-11",
+          "tickets": 0,
+          "mechanics": 3,
+          "entries": [
+            "windows/2026-05-11/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-18",
+          "tickets": 0,
+          "mechanics": 3,
+          "entries": [
+            "windows/2026-05-18/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-05-25",
+          "tickets": 0,
+          "mechanics": 2,
+          "entries": [
+            "windows/2026-05-25/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-01",
+          "tickets": 0,
+          "mechanics": 2,
+          "entries": [
+            "windows/2026-06-01/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-08",
+          "tickets": 1,
+          "mechanics": 3,
+          "entries": [
+            "windows/2026-06-08/enriched.md#t05",
+            "windows/2026-06-08/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-15",
+          "tickets": 0,
+          "mechanics": 5,
+          "entries": [
+            "windows/2026-06-15/enriched.md#cc"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 0,
+          "mechanics": 8,
+          "entries": [
+            "windows/2026-06-22/enriched.md#cc-c"
+          ]
+        },
+        {
+          "window": "2026-06-29",
+          "tickets": 1,
+          "mechanics": 4,
+          "entries": [
+            "windows/2026-06-29/enriched.md#t01",
+            "windows/2026-06-29/enriched.md#cc-c"
+          ]
+        },
+        {
+          "window": "2026-07-06",
+          "tickets": 0,
+          "mechanics": 4,
+          "entries": [
+            "windows/2026-07-06/enriched.md#cc-c"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 3,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t08",
+            "windows/2026-07-13/enriched.md#cc"
+          ]
+        }
+      ],
+      "total_tickets": 3,
+      "total_mechanics": 45,
+      "first_seen": "2026-04-13",
+      "last_seen": "2026-07-13",
+      "notes": "mechanics overlap the html/css clusters."
+    },
+    {
+      "id": "rc-cc-no-custom-code-guardrails",
+      "group": "Custom code",
+      "kind": "support",
+      "story": "As support, I repeatedly clean up custom code that shipped broken to a live mechanic — a stray debugger statement, invalid JSON in a rewards config that silently falls back to a default, secret-key-gated operations — because Maestra has no lint / validation / error-surfacing gate on custom code before it goes live.",
+      "current_solution": "Support/engineer manually finds and fixes the broken custom code (delete debugger, fix JSON, remove secret-key requirement, activate scenario).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "limevizio",
+        "atlantacutlery",
+        "movavicom"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-29",
+          "tickets": 2,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-29/enriched.md#t02",
+            "windows/2026-06-29/enriched.md#t04"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t04"
+          ]
+        }
+      ],
+      "total_tickets": 3,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-29",
+      "last_seen": "2026-07-13",
+      "notes": "Related to rc-cc-client-owned-js-breaks-reco (also custom code failing silently in prod); candidates to merge if the pattern persists."
+    },
+    {
+      "id": "rc-mf-popup-per-customer-promocode",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CSM configuring a discount pop-up, I cannot show a unique per-customer promo code on the pop-up's final screen because the pop-up mechanic only renders a single static (universal) code.",
+      "current_solution": "None — only a universal code is possible.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "zone3"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-07-06",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-06/enriched.md#t04"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-07-06",
+      "last_seen": "2026-07-06"
+    },
+    {
+      "id": "rc-mf-reco-single-algo-per-slot",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CSM, I can't add or A/B a second recommendation algorithm on the same reco-widget slot because the platform restricts each reco-widget type to one active algorithm, so testing multiple algorithms needs an engineer to enable the extra slot.",
+      "current_solution": "Engineer manually enables a second algorithm slot on the backend (no self-serve path).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "selkirkcom"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-29",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-29/enriched.md#t05"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-29",
+      "last_seen": "2026-06-29"
+    },
+    {
+      "id": "rc-bug-targeting-reach-api-triggered",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a CSM analyzing performance, targeting-reach shows 0 for pop-ups/quizzes triggered via API/command call, because a fix shipped with the end-of-May Quizzes UI release (to stop quizzes firing the targeting event on every page load) also killed the event for legitimate API-triggered widgets — it now only fires on button-triggered conditions.",
+      "current_solution": "None — under investigation (Gleb); no workaround shipped.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "SvahaUSA",
+        "hawaiicoffee",
+        "Sena"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-29",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-29/enriched.md#t09"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-29",
+      "last_seen": "2026-06-29"
+    },
+    {
+      "id": "rc-bug-popup-editor-unsaved-guard",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a marketer building a pop-up, I lose in-progress edits when I navigate away (e.g. to create a teaser) because the pop-up editor had no unsaved-changes guard and silently discarded them.",
+      "current_solution": "Fixed in-week via MR !8819 (Save/Leave/Cancel dialog + browser prompt on refresh/close).",
+      "proposed_fix": "Shipped: MR !8819 (frontend-popmech-personalization-v2).",
+      "effort": null,
+      "clients": [],
+      "occurrences": [
+        {
+          "window": "2026-06-29",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-29/enriched.md#t07"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-29",
+      "last_seen": "2026-06-29",
+      "notes": "Resolved by a shipped fix — should not recur."
+    },
+    {
+      "id": "rc-bug-reco-replace-content-race",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a CRM manager A/B-testing two reco-widget variants that both use 'replace content' on the same page slot, the variants (and any legacy site block on that slot) race to replace the same DOM node, so the widget intermittently renders empty.",
+      "current_solution": "Manual server-side/config fix per case; fallback is asking the client to remove their legacy block. Known recurring failure mode.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak",
+        "jolyn",
+        "drhonow"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-27",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-27/enriched.md#t02"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-22/enriched.md#t03"
+          ]
+        },
+        {
+          "window": "2026-07-06",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-06/enriched.md#t08"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 2,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t03",
+            "windows/2026-07-13/enriched.md#t09"
+          ]
+        }
+      ],
+      "total_tickets": 5,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-27",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-bug-reco-widget-copy-perf",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a personalization manager duplicating a reco-widget, the copy operation errors and completes only after an extreme delay, because widget-copy has a backend performance problem.",
+      "current_solution": "Engineering pushed a backend fix to speed up widget-copy.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-07-06",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-06/enriched.md#t03"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-07-06",
+      "last_seen": "2026-07-06"
+    },
+    {
+      "id": "rc-cc-client-owned-js-breaks-reco",
+      "group": "Custom code",
+      "kind": "support",
+      "story": "As a support engineer, I triage 'recommendations show nothing' reports that turn out to be client-owned custom JS (e.g. a Shopify stock-status snippet) breaking and silently marking all products out-of-stock, so the reco engine correctly returns zero — a client-custom-code failure that first looks like a Maestra bug.",
+      "current_solution": "Support rules out the reco engine, traces to product availability, and the client's own dev fixes their script.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-07-06",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-06/enriched.md#t06"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-07-06",
+      "last_seen": "2026-07-06",
+      "notes": "Related to rc-cc-no-custom-code-guardrails (custom code failing silently in prod, no validation gate)."
+    },
+    {
+      "id": "rc-bug-popup-ab-migration",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a user of the popup creation tool, adding an A/B test errored because a backend migration left the A/B-test config in a broken state.",
+      "current_solution": "Migration errors corrected server-side; user asked to retry.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "betboom"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-29",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-29/enriched.md#t03"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t14"
+          ]
+        }
+      ],
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-29",
+      "last_seen": "2026-07-13",
+      "notes": "One-off migration side-effect (not repetitive)."
+    },
+    {
+      "id": "rc-bug-popup-sms-auth-intermittent",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a merchant QA-testing a pop-up with SMS/phone authorization, the verification code intermittently failed with no trace in integration logs — an issue support couldn't reproduce.",
+      "current_solution": "None — worked on retest; ticket closed without a fix.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "coolibar"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-29",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-29/enriched.md#t08"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-29",
+      "last_seen": "2026-06-29",
+      "notes": "One-off, not reproduced (not repetitive)."
+    },
+    {
+      "id": "rc-mf-computed-props-custom-event-fields",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a marketer building personalized pushes/emails, I can't compute a customer property from an event's custom fields (e.g. most-frequent contentType over N days) because computed properties only aggregate over products/orders — so favorite-category personalization isn't possible without a large custom-field-aggregation rework.",
+      "current_solution": "None — declined as too large; suggested a dedicated event as a workaround. Closed won’t-fix, backlogged.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Aiby"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-22",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-22/enriched.md#t01"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-22",
+      "last_seen": "2026-06-22"
+    },
+    {
+      "id": "rc-mf-reco-mechanic-limit-visibility",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As an admin (often multi-brand on one tenant), I hit an undisclosed hard cap on active custom-recommendation mechanics / per-algorithm instances, with no self-serve visibility into the limit or which mechanics are stale — support must manually raise it each time.",
+      "current_solution": "Support raised the cap (5→10) in the backend and pointed out stale (StoppedDueToDisuse) mechanics to delete.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "jolyn",
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-27",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-27/enriched.md#t05"
+          ]
+        },
+        {
+          "window": "2026-06-01",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-01/enriched.md#t07"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-22/enriched.md#t02"
+          ]
+        }
+      ],
+      "total_tickets": 3,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-27",
+      "last_seen": "2026-06-22"
+    },
+    {
+      "id": "rc-mf-reco-template-upgrade-selfserve",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CS manager, I can't upgrade a reco-widget's template version in place (preserving analytics) or set per-device width — only an engineer can, by hand-editing the backend and hardcoding overrides.",
+      "current_solution": "Engineer manually migrated widgets preserving IDs/analytics, carried over custom CSS/HTML, hardcoded a per-device width.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "hawaiicoffee"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#s01"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-22/enriched.md#t04"
+          ]
+        }
+      ],
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-22"
+    },
+    {
+      "id": "rc-cc-dom-dependent-targeting-breaks",
+      "group": "Custom code",
+      "kind": "support",
+      "story": "As support/CSM, custom JS that drives a widget’s targeting or visibility by reading the client’s storefront DOM (matching elements, reacting to variant-select events) is fragile — it races with or breaks on the client’s own DOM updates and markup changes, needing bespoke per-client (and per-region) re-patching.",
+      "current_solution": "Diff against a known-good block, rewrite/simplify the custom targeting code per region (US, UK).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t02"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-22/enriched.md#t05"
+          ]
+        }
+      ],
+      "notes": "Related to rc-cc-targeting-gtm-gating (custom JS targeting) and rc-mf-reco-theme-slot-injection (DOM-dependent).",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-22"
+    },
+    {
+      "id": "rc-mf-popup-lead-dropped-phone-collision",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a merchant running a lead-gen pop-up, I silently lose a new lead when a visitor enters a different email but the same phone as an existing phone-unconfirmed profile: the anti-takeover merge block drops the whole submission with no error, no profile-history record, no email-search trace.",
+      "current_solution": "None — confirmed intentional anti-takeover behavior (~2% rate); fixes discussed, none shipped.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "urbanarmorgear"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-22",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-22/enriched.md#t06"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-22",
+      "last_seen": "2026-06-22"
+    },
+    {
+      "id": "rc-mf-reco-no-variant-data",
+      "group": "Missing feature",
+      "kind": "both",
+      "story": "As a CRM manager, reco widgets need richer product data than the feed/operations API reliably carries — per-SKU variants (size/colour) for a variant picker, and a second/alt product image — but e.g. BigCommerce and Magento feeds don't expose these consistently, so it needs a hand-built custom feed field or only partial coverage.",
+      "current_solution": "Feed team must add a custom variants=[…] JSON field per product; otherwise hand-coded.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "hawaiicoffee",
+        "Monkeysports"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-01",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-01/enriched.md#t06"
+          ]
+        },
+        {
+          "window": "2026-06-22",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-22/enriched.md#t07"
+          ]
+        }
+      ],
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-01",
+      "last_seen": "2026-06-22"
+    },
+    {
+      "id": "rc-howto-reco-preset-purchased-exclusion",
+      "group": "How-to",
+      "kind": "support",
+      "story": "As a CSM, I had to ask engineering which reco presets exclude already-purchased products (customer-keyed presets do for identified customers; product-anchored ones do not) — a product-knowledge clarification with no self-serve answer.",
+      "current_solution": "Answered in-thread by engineering. Indicates a docs/clarity gap in how reco presets are documented.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [],
+      "occurrences": [
+        {
+          "window": "2026-06-22",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-22/enriched.md#s01"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-22",
+      "last_seen": "2026-06-22",
+      "notes": "First member of the How-to / docs group (added as a 5th group after W26)."
+    },
+    {
+      "id": "rc-bug-phone-format-validation",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a client admin building an inline-block phone-capture form, I hit rejected valid phone numbers (e.g. Austrian local numbers) because Maestra Platform's phone-number validation/format list didn't include that country's local number format (too few countries supported, format too short), so valid customer phone numbers couldn't be entered/saved.",
+      "current_solution": "Support first suspected a custom \"Animation & special features\" setting or the old custom form, but the real gap was in the platform's phone format support; engineer (Eugenia) filed GitHub issue #1071 and shipped a fix adding the missing phone number format/length support within ~1 day, confirmed working by the client.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "hoeglcom"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t01"
+          ]
+        }
+      ],
+      "notes": "Resolved: GH #1071 shipped (added missing phone formats).",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-mf-reco-yotpo-ratings-integration",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CSM setting up a reco widget that shows product star-ratings/review counts, I need review data sourced from the client's Yotpo account, but Maestra Platform has no native backend integration that pulls Yotpo ratings into the product feed/custom fields, so the widget was built to call Yotpo directly client-side, causing a visible loading lag on every page view.",
+      "current_solution": "Support engineer hand-patched a copy of the widget (v57995) to read ratings from product custom fields (the standard popmechanic-rating snippet) instead of calling Yotpo client-side, eliminating the lag for now; a proper fix requires building a dedicated Yotpo backend integration (needs client's Yotpo App Key/Secret) to auto-populate those custom fields, which the engineer is queuing as a separate task and had already built once before for another merchant (furniturefair).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "drhonow"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t03"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#s01"
+          ]
+        }
+      ],
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-bug-checkout-reco-settings-ignored",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a merchant configuring a checkout-recommendations reco widget (item counts per source, max 3 total shown), I find the checkout page ignores those Maestra Platform settings, because the checkout placement's item-count/limit config isn't actually wired through from the Maestra widget UI — it's controlled instead by settings on the Shopify app side.",
+      "current_solution": "Support told the client the Maestra-side widget settings don't work for checkout recs and to configure item counts/limits via the Shopify app's own settings instead.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Deako"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t04"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-bug-geotargeting-exclusion-ignored",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a merchant relying on country-based geotargeting for an inline-block campaign, I saw the campaign display to US visitors even though I had explicitly excluded the US (\"Country None of the following: United States\"), because of a platform-side geotargeting bug in Maestra Platform that caused country-exclusion rules to be ignored/miscomputed for this campaign.",
+      "current_solution": "Engineering fixed the bug directly on the platform side within hours (no client-facing config change needed); while diagnosing, the client added a temporary rule restricting display to URLs containing \"test-preview\" so the campaign could be debugged live without showing to real US visitors.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Svaha (svahausa.maestra.io)"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t05"
+          ]
+        }
+      ],
+      "notes": "One-off; fixed platform-side within hours.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-bug-reco-carousel-mobile-device",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a CSM handling zone3's reco widget carousel, I need to fix a mobile rendering bug where the left product card progressively slides off-screen with each swipe (design intends the next card to peek in from the right) because the overflow/scroll-snap behavior of the reco-widget carousel breaks on specific Android devices (Samsung S25, Samsung Fold) and the engineer cannot reproduce it without physical access to those exact devices.",
+      "current_solution": "none — still unresolved a month after report; engineer has been unable to reproduce on available devices/emulators and is now asking the client for a screen recording since no matching physical device could be sourced internally, while the client is waiting to give the end customer a fix timeline",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "zone3"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t06"
+          ]
+        }
+      ],
+      "notes": "Device-specific, not reproducible internally; unresolved.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-bug-popup-rotation-perf-under-load",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a marketer, I saw popups on my site rotate/switch so slowly they were nearly unusable, because a traffic surge (\"привезли из рф топфан\" — a spike of RF traffic from a specific source) overloaded a personalization feature that serves/rotates popups, degrading performance for all popups on the site.",
+      "current_solution": "Support firefought it live: identified the overloaded feature and disabled it entirely; told the client performance would recover in ~5 minutes. No permanent capacity/rate-limiting fix was applied — the feature was just turned off.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "magnumbikes"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t07"
+          ]
+        }
+      ],
+      "notes": "Capacity/rate-limit gap; feature disabled as a stopgap.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-mf-per-device-placement-selector",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CSM configuring embedded blocks / recommendation widgets in Maestra Platform, I need to attach a widget to different CSS selectors on desktop vs mobile because client sites almost always use different DOM structure/selectors per device (mid-page, footer, header placements differ), but a single form only supports one attach selector — forcing me to create two separate forms/mechanics just to vary placement by device.",
+      "current_solution": "Workaround: build two separate forms/mechanics per widget, one configured with the desktop selector and one with the mobile selector. Logged as a product improvement; effort doc created in Notion (\"Per-device placement selectors for embedded blocks/recommendation widgets\"), to be implemented and tested on lucyandyak.maestra.io reco-widget/57718 where mobile placement needs to differ from desktop.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t08"
+          ]
+        }
+      ],
+      "notes": "Related to rc-mf-reco-template-upgrade-selfserve (per-device config gaps).",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-cc-editor-no-script-tag",
+      "group": "Custom code",
+      "kind": "support",
+      "story": "As a CS/account person building a custom-coded pop-up for client foodcycler, I couldn't save the AI (Claude)-generated custom HTML/CSS/JS for a subscription pop-up because the pasted code included a `<script>` tag (not supported/stripped by the pop-up custom-code editor) and CSS that relied on that script to toggle the first screen to visible, so the save was rejected and the mechanic looked broken.",
+      "current_solution": "Support engineer inspected the pasted markup/CSS in the thread and told the user to remove the `<script>` block and instead set `display: block` on the main screen directly in the CSS. User then fed the working template's structure back to their AI assistant to get compliant code themselves - no product change made.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "foodcycler"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t09"
+          ]
+        }
+      ],
+      "notes": "Custom-code editor limitation surfaced by AI-generated code.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-bug-popup-image-responsive-padding",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a user building a popup in Maestra Platform, I use the same image for both Desktop and Mobile in the popup image block, but the image renders with different \"padding\" between the two breakpoints because on mobile the image doesn't inherit the size of its `popmechanic-image-container` when the image size is set as a percentage (e.g. 40%), leaving no clear property to force the image to match its container.",
+      "current_solution": "None confirmed. Support suggested setting an explicit width instead of a percentage-based size, but the user never confirmed this fixed the mismatch and the thread went unanswered after two follow-up pings from the responder.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [],
+      "occurrences": [
+        {
+          "window": "2026-04-20",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-20/enriched.md#t04"
+          ]
+        },
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#t10"
+          ]
+        }
+      ],
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-20",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-mf-reco-bundle-discount-on-add",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CSM setting up a Rebuy-style \"add these products together\" bundle recommendation widget for a client, I need to reuse a proven config/setup pattern from prior projects, and I hit a product gap where a discount cannot be restricted to trigger only when the product was added via the recommendation widget (as opposed to added to cart independently).",
+      "current_solution": "Pointed to three existing bundle reco-widget setups to copy the config/logic from (Bokksu, Sena, BlueQ). The discount-only-when-added-from-rec behavior itself is not supported and has no workaround — just flagged as a known limitation.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [],
+      "occurrences": [
+        {
+          "window": "2026-06-15",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-15/enriched.md#s02"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-15",
+      "last_seen": "2026-06-15"
+    },
+    {
+      "id": "rc-bug-popup-partial-submission-dropoff",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a client running a pop-up that collects email + phone with SMS/code verification, I need \"partial submission\" to subscribe the contact even if they abandon before finishing verification, because the partial-submission logic only fired when the user dropped off at the phone-input step — not when they dropped off after requesting the code but before confirming it — so most leads were captured as contacts but never actually subscribed.",
+      "current_solution": "Maestra engineer traced the bug live, patched the partial-submission logic so it handles drop-off at the code-confirmation step too, and released it to production across all screens/variations for bedkingdom; the same template logic was also propagated to the client's inline block and to the affected 4ocean pop-up.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "bedkingdom (also affected 4ocean)",
+        "deako"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-05-11",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-11/enriched.md#t01"
+          ]
+        },
+        {
+          "window": "2026-06-08",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-08/enriched.md#t02"
+          ]
+        },
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t12"
+          ]
+        }
+      ],
+      "notes": "High-impact: bedkingdom lost ~95% of subscriptions; also hit 4ocean. Fixed.",
+      "total_tickets": 3,
+      "total_mechanics": 0,
+      "first_seen": "2026-05-11",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-mf-reco-image-optimization",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CSM relaying a client issue, I need the reco widget's image optimization to balance load speed and quality because today the \"optimize images\" toggle is all-or-nothing: turned off, large product images load slowly in the reco widget; turned on, large images get compressed to visibly poor quality — there's no smarter compression/resizing logic, and no visible backlog to track this and similar reco-widget improvement asks.",
+      "current_solution": "No product fix; engineer manually reviewed the case and filed a one-off Notion task (\"robot even suggested how to improve compression\") for a future fix on the affected reco widget (lucyandyak.maestra.io/personalization/reco-widget/57936). No standing backlog/intake process for reco improvement ideas exists yet.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Lucy & Yak (lucyandyak)"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-08",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-08/enriched.md#t04"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-08",
+      "last_seen": "2026-06-08"
+    },
+    {
+      "id": "rc-bug-reco-report-assisted-revenue-double-count",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a client reviewing the Product Recommendations BI report, revenue/AOV numbers are wrong or silently drift because the reco reporting data mart has multiple accuracy bugs — assisted-revenue double-counting multi-product clicks in one order, attribution counting orders against future clicks (~10% inflation), a recalc bug shrinking revenue for data older than 30 days, and breakage during infra migration.",
+      "current_solution": "Engineer manually found the double-counting bug in the assisted-revenue/average-check query for the widget table and fixed it directly (other report sections like uplift/graph and direct revenue were already deduplicated correctly and unaffected).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Jolyn"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-01",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-01/enriched.md#t03"
+          ]
+        },
+        {
+          "window": "2026-06-08",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-08/enriched.md#t06"
+          ]
+        }
+      ],
+      "notes": "Fixed; BI assisted-revenue query double-counted multi-product clicks in one widget.",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-01",
+      "last_seen": "2026-06-08"
+    },
+    {
+      "id": "rc-mf-shopify-two-way-sync",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As an account manager relaying a Shopify-merchant client's question, I need to tell them whether pop-up sign-ups, subscribe/unsubscribe status, and Maestra segments sync to Shopify customer records, and whether the Shopify customer-account-portal (Profile/Orders) can show loyalty tier + $ value of points and collect/sync preference fields (birthday, size, channel opt-ins) back to Maestra — because Maestra currently has no native two-way sync between its pop-up/segment data and Shopify's customer DB, and Shopify customer-account-portal customization widgets are still an early, mostly-unbuilt area of the Shopify app.",
+      "current_solution": "None native. Confirmed answers were \"no\" to auto-adding pop-up subscribers to Shopify DB, no subscribe/unsubscribe sync, no segment export to Shopify — data can only be pushed out via webhooks (custom integration work). Customer-account-portal customization was previously deprioritized; only basic Shopify \"card\" pieces have shipped so far, and the dev lead said he'd pick it up only \"at the very least\" (low priority, no committed timeline).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [],
+      "occurrences": [
+        {
+          "window": "2026-06-08",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-08/enriched.md#s02"
+          ]
+        }
+      ],
+      "notes": "Pop-up/segment data has no native two-way sync to Shopify customer DB; account-portal customization deprioritized.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-08",
+      "last_seen": "2026-06-08"
+    },
+    {
+      "id": "rc-mf-reco-widget-visual-customization",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CSM, non-standard reco-widget visuals and layouts — nav arrows, card borders, image positioning, using a merchant's own carousel, and composing multiple algorithms into one 'complete the look' multi-product card — can't be done in the builder (the reco AI assistant can't author CSS/JS), so every non-standard tweak dead-ends into hours of iteration and a developer hand-building CSS/JS per widget.",
+      "current_solution": "CSM burns hours with the reco AI builder, then escalates; an engineer flips a hidden settings checkbox and hand-writes CSS/JS (arrow visibility, card frames, Swiper wiring, label positioning), repeated per widget.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "drhonow",
+        "lucyandyak",
+        "selkirkcom"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-20",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-20/enriched.md#s01"
+          ]
+        },
+        {
+          "window": "2026-04-27",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-27/enriched.md#s02"
+          ]
+        },
+        {
+          "window": "2026-05-04",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-04/enriched.md#s01"
+          ]
+        },
+        {
+          "window": "2026-05-11",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-11/enriched.md#s01"
+          ]
+        },
+        {
+          "window": "2026-05-25",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-25/enriched.md#t01"
+          ]
+        },
+        {
+          "window": "2026-06-08",
+          "tickets": 3,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-08/enriched.md#t01",
+            "windows/2026-06-08/enriched.md#t03",
+            "windows/2026-06-08/enriched.md#s01"
+          ]
+        }
+      ],
+      "notes": "Reclassified t01/s01 from Custom code → Missing feature (fix = self-serve reco visual builder). Closely related to rc-mf-reco-variant-dedup, rc-mf-reco-theme-slot-injection, rc-mf-reco-template-upgrade-selfserve, rc-mf-per-device-placement-selector — the reco-widget-not-self-serve family; candidates to consolidate.",
+      "total_tickets": 8,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-20",
+      "last_seen": "2026-06-08"
+    },
+    {
+      "id": "rc-bug-popup-editor-hidden-field",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As an internal team member reviewing a client's live pop-up (natvbasics), I saw stray Russian placeholder text leak into the pop-up settings because the editor hid the name/systemName field for certain non-input elements (e.g. \"buttons_input\"/choice in multiple mode) once auto-filled, so a leftover auto-generated name could never be edited or cleaned by the client.",
+      "current_solution": "Engineering fixed it at the source: FE MR removed the name field from non-input elements on add, a backend migration purged the unused `name` on old screen_elements, then a second FE MR exposed the name/systemName fields for buttons_input in both single and multiple mode so the stuck case could be edited (no further DB migration needed there since runtime only keys off systemName).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "natvbasics"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-01",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-01/enriched.md#t05"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-01",
+      "last_seen": "2026-06-01"
+    },
+    {
+      "id": "rc-bug-reco-variant-selector-broken",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a CRM manager configuring the checkout recommendation widgets on lucyandyak.maestra.io, I enabled variant selection on both widgets but it doesn't work in either, and one widget also fails to display the product name, because of a bug in the Maestra Platform reco widget's variant-selector/product-name rendering logic.",
+      "current_solution": "No client-side workaround; ticket was escalated out of the normal support flow directly to the widget engineer (Eugene K) in a dedicated dev Slack channel, who fixed it there roughly a month after the initial report.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-01",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-01/enriched.md#t08"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-01",
+      "last_seen": "2026-06-01"
+    },
+    {
+      "id": "rc-bug-reco-update-pipeline-stuck",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a user of product recommendations widgets, I saw the recommendations feed stuck in the \"updating\" step for over 1.5 hours (serving stale items) because of an unspecified backend issue in the reco-update pipeline (\"some strange shit happened\" per the engineer, no root cause documented).",
+      "current_solution": "Engineer (U07KWMH4JSV) manually intervened after being pinged and pinged again by a colleague; no automated detection/alerting, no self-service fix — resolved by direct engineering fix, cause undocumented.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Pescatoreny"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-01",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-01/enriched.md#t10"
+          ]
+        }
+      ],
+      "notes": "No alerting/self-service; engineer manually intervened. No documented root cause.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-01",
+      "last_seen": "2026-06-01"
+    },
+    {
+      "id": "rc-howto-popup-form-config",
+      "group": "How-to",
+      "kind": "support",
+      "story": "As a marketer, I need clarity on how pop-up form capture works — fields must be added explicitly per variant, and the email is already captured on pop-up/tab close (not only on submit-button click). Recurring product-knowledge confusion.",
+      "current_solution": "Support clarifies the existing behaviour; no product change.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "copenhagenliving",
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-01",
+          "tickets": 2,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-01/enriched.md#t01",
+            "windows/2026-06-01/enriched.md#t02"
+          ]
+        }
+      ],
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-01",
+      "last_seen": "2026-06-01"
+    },
+    {
+      "id": "rc-howto-reco-silent-misconfig",
+      "group": "How-to",
+      "kind": "support",
+      "story": "As a CSM, a reco widget silently returns nothing or a feature looks broken because a required setting was not enabled (external system not selected → no product mapping; add-to-cart toggle off) and no error is surfaced — so it always ends up as a support diagnosis.",
+      "current_solution": "Support inspects the widget config and flips the missing setting.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak",
+        "sarahssilks"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-06-01",
+          "tickets": 2,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-06-01/enriched.md#t04",
+            "windows/2026-06-01/enriched.md#t09"
+          ]
+        }
+      ],
+      "notes": "Fix could be validation/error surfacing (Missing feature); kept How-to per resolution style.",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-06-01",
+      "last_seen": "2026-06-01"
+    },
+    {
+      "id": "rc-bug-reco-zero-weight-algo-op",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As an engineer shipping the multi-algorithm reco checkout widget, failed recommendation operations occurred because the operation was still called even when an algorithm's weight was 0 (the default weight).",
+      "current_solution": "Fixed same-day: operation no longer called when weight is 0.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "jolyn"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-05-25",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-25/enriched.md#t02"
+          ]
+        }
+      ],
+      "notes": "One-off release regression.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-05-25",
+      "last_seen": "2026-05-25"
+    },
+    {
+      "id": "rc-bug-reco-min-count-selector-embed",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a CSM, a reco widget rendered even when it had fewer products than its configured minimum-to-show threshold, because the hide-if-below-minimum logic was broken specifically when the widget is embedded via a CSS selector instead of the data-popmechanic-embed attribute.",
+      "current_solution": "Engineer diagnosed via HAR and fixed same-day.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "bokksu"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-05-25",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-25/enriched.md#t03"
+          ]
+        }
+      ],
+      "notes": "One-off; selector-embed display-logic bug.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-05-25",
+      "last_seen": "2026-05-25"
+    },
+    {
+      "id": "rc-howto-reco-ab-participant-counting",
+      "group": "How-to",
+      "kind": "support",
+      "story": "As a client running a reco-widget A/B test, the reported participant split looks skewed (70/30 despite 50/50 device allocation, non-zero clicks on the no-widget control) because participant counting is asymmetric: control counts eligibility (every device the API could have served) while variant only counts devices where the widget actually rendered — dropping 30–50% of variant devices — so a true 50/50 looks broken.",
+      "current_solution": "Support explains the eligibility-vs-render metric definition; no reporting change.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lectricebikes"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-05-25",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-25/enriched.md#t04"
+          ]
+        }
+      ],
+      "notes": "Fix could be symmetric counting / clearer reporting (Missing feature); kept How-to per resolution.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-05-25",
+      "last_seen": "2026-05-25"
+    },
+    {
+      "id": "rc-cc-legacy-tracker-per-theme-layout",
+      "group": "Custom code",
+      "kind": "support",
+      "story": "As a merchant on a legacy manual Maestra tracker install (script in theme.liquid rather than the app embed), the tracker isn't present on alternate theme layout files it was never added to, so it silently fails to load there and the reco widget doesn't render/preview on those pages while working on all others.",
+      "current_solution": "Support traces it to the alternate layout and switches the site from the manual liquid snippet to the Maestra app embed (propagates to all layouts).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lectricebikes"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-05-04",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-04/enriched.md#t01"
+          ]
+        },
+        {
+          "window": "2026-05-11",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-11/enriched.md#t02"
+          ]
+        }
+      ],
+      "notes": "Legacy install fragility; may be silently costing performance across older accounts.",
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-05-04",
+      "last_seen": "2026-05-11"
+    },
+    {
+      "id": "rc-bug-popup-heading-textarea-regression",
+      "group": "Bug",
+      "kind": "support",
+      "story": "A text→textarea change to the pop-up heading field (requested so CSMs could inject multi-line custom HTML there) introduced a rendering regression across ALL pop-ups, not just ones using custom HTML.",
+      "current_solution": "Change shipped, broke rendering; reported with Loom 06-18, unfixed ~2 weeks, handed between engineers.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Trashie",
+        "AlmondCow"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-05-04",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-04/enriched.md#t02"
+          ]
+        }
+      ],
+      "notes": "Root desire (custom HTML in heading) is a template-gap symptom.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-05-04",
+      "last_seen": "2026-05-04"
+    },
+    {
+      "id": "rc-bug-reco-custom-js-vanishes",
+      "group": "Bug",
+      "kind": "support",
+      "story": "Custom JS content silently disappears from a reco-widget (and its copies) while the custom-JS toggle stays on, with no before/after audit-log diff to diagnose the loss.",
+      "current_solution": "User investigated the event-log herself; no confirmed dev fix.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "zone3"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-05-04",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-04/enriched.md#t03"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-05-04",
+      "last_seen": "2026-05-04"
+    },
+    {
+      "id": "rc-bug-reco-widget-load-latency",
+      "group": "Bug",
+      "kind": "support",
+      "story": "The reco widget's backend recommendation call (CDP product-description lookups) took several seconds (p50 ~1.5–1.8s, up to 3s), making it visibly slower than a competing widget and blocking cutover.",
+      "current_solution": "Backend fix 'Phase 6' cut p50 ~90% (>1.5s → <200ms, APDEX 0.5→0.99+).",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Monkeysports"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-05-04",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-05-04/enriched.md#t04"
+          ]
+        }
+      ],
+      "notes": "Affected recommendation services across many projects.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-05-04",
+      "last_seen": "2026-05-04"
+    },
+    {
+      "id": "rc-bug-popup-regional-render",
+      "group": "Bug",
+      "kind": "support",
+      "story": "A pop-up rendered broken/incorrectly on the live storefront (a region-specific rendering bug), so end customers saw a broken widget.",
+      "current_solution": "Engineering fixed it server-side (confirmed in the RF region) and rolled out globally.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "doraihome"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-27",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-27/enriched.md#t01"
+          ]
+        }
+      ],
+      "notes": "One-off regional render bug.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-27",
+      "last_seen": "2026-04-27"
+    },
+    {
+      "id": "rc-mf-reco-ranking-opacity-tuning",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "Custom Recommendations ranking is opaque (category/segment filter → attribute-similarity, then popularity only on exact ties, with a hidden 180-day popularity window) and the lookback isn't tunable in the admin UI, so every time a merchant questions why a lower-selling product outranks a bestseller it takes manual investigation to justify.",
+      "current_solution": "Dev walked the client through the algorithm and pulled ad-hoc Metabase numbers; a configurable-lookback feature was declined (only ~3 projects need it) in favour of a one-off hardcoded 180→60-day override for Jolyn.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Jolyn"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-27",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-27/enriched.md#t03"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-27",
+      "last_seen": "2026-04-27"
+    },
+    {
+      "id": "rc-bug-reco-preview-hash-missing",
+      "group": "Bug",
+      "kind": "support",
+      "story": "A bundle reco widget's live-site preview test-hash sometimes points to settings that 'can't be found in database', so the preview never renders (console logs a personalization failure) even though the widget's own preset-preview works.",
+      "current_solution": "Re-save the widget (no content change) to regenerate a fresh preview hash; no root cause found.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "sena"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-27",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-27/enriched.md#t04"
+          ]
+        }
+      ],
+      "notes": "One-off; saved preview settings periodically go unresolvable in DB.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-27",
+      "last_seen": "2026-04-27"
+    },
+    {
+      "id": "rc-bug-inline-block-form-localization-missing",
+      "group": "Bug",
+      "kind": "support",
+      "story": "An inline-block's settings form is missing localization entries (created under a Russian locale), making its content settings confusing/incomplete to edit.",
+      "current_solution": "Fix prevents newly created inline-block forms losing localization; forms already created (and their copies) are not retroactively backfilled.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "natvbasics"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-20",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-20/enriched.md#t02"
+          ]
+        }
+      ],
+      "notes": "One-off; legacy forms keep the gap.",
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-20",
+      "last_seen": "2026-04-20"
+    },
+    {
+      "id": "rc-mf-reco-explicit-cart-rules",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a merchant, I want explicit product-to-product recommendation rules based on cart contents (e.g. Boomstick in cart → recommend paddle case) with a fallback algorithm when no rule matches, but reco presets only offer the algorithmic 'often purchased with items in product list', not custom explicit mappings with fallback chaining.",
+      "current_solution": "Approximate with the algorithmic preset via segments; a Notion dev effort was filed, no build confirmed. Ticket sat 5+ weeks, closed unresolved.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "selkirkcom"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-20",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-20/enriched.md#t03"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-20",
+      "last_seen": "2026-04-20"
+    },
+    {
+      "id": "rc-mf-subscription-source-attribution",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a CRM manager, I can't see the source of each subscription (signed up via pop-up vs registration form) because there's no report or field linking a subscription to the action that created it — so list growth can't be attributed or segmented by acquisition channel.",
+      "current_solution": "Support pulls a one-off dataset from raw event/action data; no built-in link, no permanent fix.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "Jolyn"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-04-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-04-13/enriched.md#t02"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-04-13",
+      "last_seen": "2026-04-13"
+    },
+    {
+      "id": "rc-mf-reco-variant-availability-filter",
+      "group": "Missing feature",
+      "kind": "support",
+      "story": "As a merchandiser/CSM, my reco widget recommends out-of-stock or unpublished variants because Maestra has no self-serve way to define what 'available' means for my catalog — especially Shopify multi-channel stores where real availability is a multi-signal AND (Active + stock metafield + Online-Store publication) — so every catalog needs bespoke availability logic hand-built by an engineer.",
+      "current_solution": "Eng shipped a partial platform patch (treat only explicit available=true as available) and, per-tenant, hand-built a custom 3-signal availability filter documented in the Shopify-integration runbook.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-07-13",
+          "tickets": 2,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t05",
+            "windows/2026-07-13/enriched.md#t06"
+          ]
+        }
+      ],
+      "total_tickets": 2,
+      "total_mechanics": 0,
+      "first_seen": "2026-07-13",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-bug-feed-invalid-char-rejection",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a client syncing a product feed, a single invisible/zero-width unicode character in one custom-field value makes the importer reject the whole product/field instead of sanitizing or skipping it, so new products silently stop syncing.",
+      "current_solution": "Eng manually dropped the offending custom field from the feed mapping; no value-sanitization fix in the importer.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t07"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-07-13",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-bug-inapp-redirect-not-firing",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a client, customers who click an in-app message's CTA aren't taken to the configured page because the in-app click-redirect action doesn't fire correctly (or the deep link isn't handled), so the in-app CTA leads nowhere.",
+      "current_solution": "None — ticket stalled after the initial report; reporter re-pinged a week later.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "mokka-eu"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t11"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-07-13",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-bug-legacy-feed-ownership-stale",
+      "group": "Bug",
+      "kind": "support",
+      "story": "As a CSM troubleshooting a legacy client, the product feed is stale with no clear owner or source of truth — an old third-party-agency setup points at a dead externally-hosted feed URL and nobody can tell whether settings consume it or a Maestra-generated feed.",
+      "current_solution": "Support dug through candidate feed URLs, could not confirm the live source, escalated to eng in another channel; ticket marked solved but resolution not captured.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "magnumbikes"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t13"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-07-13",
+      "last_seen": "2026-07-13"
+    },
+    {
+      "id": "rc-howto-targeting-custom-field-audience",
+      "group": "How-to",
+      "kind": "support",
+      "story": "As a CSM, I need a zone/region audience filter but only found a distance-radius option and did not know the supported path is a custom-field-backed area filter, so I needed eng to walk me through building it (mirroring another project).",
+      "current_solution": "Eng walked the CSM through creating an \"Area\" custom field and building the audience filter from it; pure config consultation, no product change.",
+      "proposed_fix": null,
+      "effort": null,
+      "clients": [
+        "lucyandyak"
+      ],
+      "occurrences": [
+        {
+          "window": "2026-07-13",
+          "tickets": 1,
+          "mechanics": 0,
+          "entries": [
+            "windows/2026-07-13/enriched.md#t10"
+          ]
+        }
+      ],
+      "total_tickets": 1,
+      "total_mechanics": 0,
+      "first_seen": "2026-07-13",
+      "last_seen": "2026-07-13"
+    }
+  ]
+}
