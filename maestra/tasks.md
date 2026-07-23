@@ -12,24 +12,43 @@ _organized: true
   Failed logs: https://furniturefairnet.maestra.io/integration-logs/operations?operation=furniturefairnet.Shopify.CheckoutContactInfoSubmitted&operations-status=Failed
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783428508223759
 
-- [ ] **CF-1610 — Sasha Haishun: Lectric Ebikes quiz + виджет reco (перезавести тест)** — Sasha Haishun
-  Sasha 13.07: Фил попросил перезавести тест на Lectric eBikes. Старый widget 58262, новый 59616. Full контекст в #dev-general.
-  Widget new: https://lectricebikes.maestra.io/personalization/reco-widget/59616
-  Thread: https://maestraio.slack.com/archives/D09LNLKC4TZ/p1783955703639869
+- [ ] **CF-1650 — bulk backfill container_id (относится к CF-1268)** — Roman + team
+  15.07 open. Продолжение CF-1268: попросили запустить бэкфил поля container_id.
+
+- [ ] **Phil UX card: лиды формы по клику из отчёта** — Philipp Volnov
+  16.07: Phil завёл карточку, спрашивает делается ли в два счета. Gleb: «по идее можно фильтр ебнуть, вроде изян». Оценить эффорт.
+  Notion: https://app.notion.com/p/39ee08805078815f9acedd34eefd7e2c
+  Thread: https://maestraio.slack.com/archives/C07KJ72STNW/p1784159203942499
+
+- [ ] **CF-1668 — deako popup verification code: контакт в базе → код не проходит (похоже CF-1428)** — Phil + Артём
+  16.07: Phil ввожу код — не работает. Артём: «может контакт уже в базе». Phil подтвердил: удалить телефон → работает. Похоже такой же кейс как CF-1428 lead-gen popup dup phone.
+  Popup: https://deako.maestra.io/personalization/pop-up/59673/settings
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1784214427144459
+
+- [ ] **CF-1651 reopened — bug: не работает добавление продукта / обновление корзины (desktop + mobile)** — TBD
+  Был закрыт 15.07 как done, но CF вернул в pending 16.07. Разобраться что не так.
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1784108286481209
+
+- [ ] **CF-1653 — myflowers quiz становился, «просто выключился модуль»** — Anna Stepanova _(prio high)_
+  Repro: https://myflowers.maestra.io/quizzes/quiz/ff966298-5258-4f85-9801-88f8a2881263?tab=Settings
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1784113996220559
+
+- [ ] **CF-1673 — Angel: вернуть «unlimited» sending interval option** — TBD
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1784242719065189
+
+- [ ] **Phil inapp: кнопка Upload image в кастомном HTML** — Philipp + Артём
+  17.07: Phil просит кнопку Upload image (как в HTML-редакторе писем) в inapps с кастомным HTML. Артём собрал задачу в Notion, ждёт от Gleb: сложно / изян. Обсудить где хранить картинки + как вставлять по указателю.
+  Notion: https://app.notion.com/p/3a3e08805078812f810af278c3ef2026
+  Thread: https://maestraio.slack.com/archives/C07KJ72STNW/p1784299413074049
+
+- [ ] **Retro Final Edition (Sergey): встреча про разбор саппорта персо** — Sergey Neudachin + Gleb
+  16.07: Sergey в ретро выдал action: «Gleb заведёт встречу про разбор саппорта персо, возьмёт Серёгу на прокачку формата».
+  Miro: https://miro.com/app/board/uXjVISpu5Fg=/
+  Thread: https://maestraio.slack.com/archives/C07KUJQHG93/p1784201544790939
 
 - [ ] **selkirkcom / SvahaUSA: clear cart after CheckoutCompleted (pixel fix)** — Alex Glazkov
   13.07: Price Drop email на уже купленный товар. Alex: cart не очищается после checkout из-за async processing. Клиент репортит несколько раз в неделю. Alex просит quick fix в pixel logic — на trigger «Checkout completed» вызывать «Update cart» для очистки. Alex: «may be more interesting than I thought», продолжает копать.
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783944702245289
-
-- [ ] **CF-1564 — Eugenia lucyandyak: reco не подгружаются в мини-корзину без reload** — Eugenia Smirnova
-  Site не обновляет страницу с корзиной, из-за этого reco не подтягиваются. Разобрал: сайт хитро себя ведёт, нужен код блока целиком. «Цепанем в спринте», делать нашу карточку.
-  Widget: https://lucyandyak.maestra.io/personalization/reco-widget/58077
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1783510386327129
-
-- [ ] **CF-672 reopened — Julia Lo: sena widget dedup / control когда recs load** — Julia Lo
-  Julia 29.06 reopened: убрать targeting нельзя (виджет полностью исчезает), но с ним «filter out duplicates» ломает соседние reco. Прямой вопрос: обсуждаем ли improvements по control когда recs load? Ответить + подумать про фичу.
-  Widget: https://sena.maestra.io/personalization/reco-widget/52707
-  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1773338878182269
 
 - [ ] **CF-1384 — selkirkcom: chat + Fabio's errors (San Diego)** — Phil + Sasha
   Чат уже починил («говна поел, довольно оригинально»). Fabio ошибку с ходу не откопал — нужен ещё подход. Скрин получил.
@@ -116,5 +135,10 @@ _organized: true
 - [ ] **Trashie errors после фиксов** — Alex Glazkov + ClearFeed bot
   Дать ответ — residual ожидаемые или нужны ещё фиксы.
   Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1780920351147619
+
+- [ ] **CF-1691 — lucyandyak: неизвестная операция `!SdkMethod` в integration-logs** — Anna + Alex Glazkov
+  20.07: Alex пинганул. Gleb ответил «он вообще не должен дёргаться, странное, заведу баг». Issue #1195 создан. Ждём фикс.
+  Issue: https://github.com/maestra-io/issues-maestra/issues/1195
+  Thread: https://maestraio.slack.com/archives/C08FEDXGQUC/p1784541074775759
 
 ## Scheduled / future
