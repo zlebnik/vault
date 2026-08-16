@@ -1,0 +1,11 @@
+[Unit]
+Description=CheckCheck autonomous dev queue (tick every 15 min after previous run ends)
+
+[Timer]
+OnBootSec=5min
+# Отсчёт от ЗАВЕРШЕНИЯ предыдущего запуска: 3-часовая сессия не породит очередь тиков.
+OnUnitInactiveSec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=CheckCheck autonomous dev queue tick
+
+[Service]
+Type=oneshot
+ExecStart=/home/zlebnik/vault/development/queue-runner.sh
+WorkingDirectory=/home/zlebnik/vault/development
+Environment=PATH=/home/zlebnik/.local/share/mise/shims:/usr/local/bin:/usr/bin
+Environment=CLAUDE_BIN=/home/zlebnik/.local/share/mise/installs/claude/latest/claude
+# Страховка поверх timeout(1) в скрипте (3h на сессию claude)
+TimeoutStartSec=4h
+Nice=10
