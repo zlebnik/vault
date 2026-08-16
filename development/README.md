@@ -50,6 +50,3 @@ journalctl --user -u checkcheck-agent -f  # живой лог тиков
 Тест state machine без токенов: положить JSON в `state/logs/fake.json` и
 запустить `AGENT_DRY_RUN=1 ./queue-runner.sh` (GitHub не мутируется, claude не
 запускается).
-
-Известное ограничение: gh-токен без scope `workflow` — issues, требующие правок
-`.github/workflows/`, автоматически уходят в `agent:blocked`.

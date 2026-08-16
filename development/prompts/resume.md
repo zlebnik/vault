@@ -20,5 +20,5 @@ Same completion contract:
 - Definition of done: PR open ending with `Closes #{{ISSUE}}`, CI green, Codex
   review handled. Then print exactly, as the last line: `AGENT_DONE PR=<pr-url>`
 - If stuck: `AGENT_BLOCKED: <one-line reason>`
-- Do not merge the PR. Do not touch `.github/workflows/`.
+- Do not merge the PR.
 - On finish (done or blocked) send a push notification via PushNotification.

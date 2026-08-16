@@ -44,12 +44,8 @@ Step by step:
    substantive fixes comment `@codex review` and wait again.
 
 Hard constraints:
-- You MUST NOT create or modify anything under `.github/workflows/` — the gh
-  token lacks the `workflow` scope and the push will fail. If the issue cannot
-  be solved without workflow changes, stop immediately and print exactly:
-  `AGENT_BLOCKED: requires .github/workflows changes — <one-line reason>`
-- If you become genuinely stuck for any other reason (need a product decision,
-  missing credentials, contradictory requirements), stop and print:
+- If you become genuinely stuck (need a product decision, missing credentials,
+  contradictory requirements), stop and print:
   `AGENT_BLOCKED: <one-line reason>`
 - Do NOT merge the PR. The human merges.
 

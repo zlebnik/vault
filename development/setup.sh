@@ -22,9 +22,6 @@ done
 [[ -x $CLAUDE_BIN ]] || { echo "нет claude: $CLAUDE_BIN" >&2; exit 1; }
 git -C "$REPO" remote get-url origin >/dev/null || { echo "нет клона: $REPO" >&2; exit 1; }
 gh auth status >/dev/null || { echo "gh не авторизован" >&2; exit 1; }
-if ! gh auth status 2>&1 | grep -q workflow; then
-  echo "⚠ gh-токен без scope 'workflow' — issues с правкой .github/workflows/ будут уходить в agent:blocked (by design)"
-fi
 
 # --- 2. Лейблы (идемпотентно: --force обновляет существующие) ---------------
 gh label create agent:wip     -R "$GH_REPO" -c '#fbca04' -d 'Queue: taken by the agent'            --force

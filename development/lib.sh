@@ -140,12 +140,9 @@ handle_result() {
     return 0
   fi
 
-  # 2. Явная блокировка (маркер агента или отказ push из-за workflow-scope).
-  if grep -q 'AGENT_BLOCKED' <<<"$result" || \
-     grep -q 'refusing to allow an OAuth App' "$OUT_ERR" 2>/dev/null; then
-    local reason
-    reason=$(grep -o 'AGENT_BLOCKED:.*' <<<"$result" | head -1)
-    block_issue "${reason:-push отклонён: нет workflow-scope у gh-токена}"
+  # 2. Явная блокировка по маркеру агента.
+  if grep -q 'AGENT_BLOCKED' <<<"$result"; then
+    block_issue "$(grep -o 'AGENT_BLOCKED:.*' <<<"$result" | head -1)"
     return 0
   fi
 
