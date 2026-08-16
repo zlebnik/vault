@@ -27,6 +27,15 @@ if [[ -s $STATE ]]; then
     log "backoff до $(date -d "@$next" +'%F %T') — пропуск тика"
     exit 0
   fi
+  # Экономия лимита: пока PR есть и CI ещё крутится — claude не дёргаем,
+  # тик просто проверяет чеки через gh и выходит.
+  if [[ -n $(state_get .pr_url) && ${AGENT_DRY_RUN:-0} != 1 ]]; then
+    vr=0; verify_pr_done "$WT" || vr=$?
+    if (( vr == 2 )); then
+      log "PR $(state_get .pr_url): CI ещё идёт — пропуск тика без claude"
+      exit 0
+    fi
+  fi
   log "resume issue #$ISSUE (phase=$(state_get .phase), session=$SID)"
   state_update '.phase="running"'
   rc=0

@@ -11,6 +11,11 @@ First re-establish the facts — do NOT trust your memory of previous progress:
 
 Then continue from wherever the work actually stopped and finish it.
 
+IMPORTANT: nothing re-invokes you — background waits are useless, and ending
+your turn "to wait" just kills the session. Wait for CI in the FOREGROUND with
+`gh pr checks <pr> --watch`; poll Codex with foreground `sleep` loops. End the
+turn only with AGENT_DONE or AGENT_BLOCKED.
+
 Same completion contract:
 - Definition of done: PR open ending with `Closes #{{ISSUE}}`, CI green, Codex
   review handled. Then print exactly, as the last line: `AGENT_DONE PR=<pr-url>`

@@ -32,7 +32,9 @@ Step by step:
    `Co-Authored-By: Claude <model> <noreply@anthropic.com>`
 5. Push the branch (`git push -u origin <branch>`) and open a PR whose body
    ends with `Closes #{{ISSUE}}`.
-6. Watch CI: `gh pr checks <pr> --watch`. If red — diagnose, fix, push, repeat.
+6. Watch CI in the FOREGROUND: `gh pr checks <pr> --watch`. If red — diagnose,
+   fix, push, repeat. Nothing re-invokes you after your turn ends — background
+   waits are useless; never end the turn "to wait" for something.
 7. Wait for the Codex auto-review (inline comments or a 👍 reaction on the PR).
    Poll every ~2 minutes for up to 20 minutes:
    `gh pr view <pr> --comments` and
