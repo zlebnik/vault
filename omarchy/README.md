@@ -17,7 +17,7 @@ All root changes are delivered as **self-contained scripts** you run yourself
 | Random **hard freezes** (login screen, on wake) | amdgpu **SMU firmware hang** — `SMU: No response` / `Failed to disable gfxoff!` (27× in logs) | kernel param `amdgpu.gfxoff=0` | [`scripts/fix-amdgpu-gfxoff-freeze.sh`](scripts/fix-amdgpu-gfxoff-freeze.sh) |
 | **Black screen** at boot (system boots fine, panel stays dark) | display bring-up / Panel Self Refresh | kernel param `amdgpu.dcdebugmask=0x10` (disable PSR) | [`scripts/fix-amdgpu-black-screen-psr.sh`](scripts/fix-amdgpu-black-screen-psr.sh) |
 | **Keyboard dead after resume** | keyboard is the detachable **USB dock** (`0b05:1a30`) that intermittently fails to re-init on s2idle wake | udev power-pin + system-sleep rebind hook | [`scripts/fix-asus-z13-keyboard-resume.sh`](scripts/fix-asus-z13-keyboard-resume.sh) |
-| **Clamshell** (lid closed + external monitor → internal panel off, stay awake) | logind suspends on lid before Hyprland can react | ~~logind drop-in + `clamshell.sh`~~ **retired 2026-08-22**: Omarchy handles clamshell natively now, and the old drop-in actively broke suspend — see [Clamshell mode](#clamshell-mode) | [`scripts/setup-clamshell-logind.sh`](scripts/setup-clamshell-logind.sh)` --uninstall` |
+| **Clamshell** (lid closed + external monitor → internal panel off, stay awake) | logind suspends on lid before Hyprland can react | ~~logind drop-in + `clamshell.sh`~~ **retired & uninstalled 2026-08-22**: Omarchy handles clamshell natively now, and the old drop-in actively broke suspend — see [Clamshell mode](#clamshell-mode--retired-2026-08-22) | — (scripts removed; in git history) |
 | **Speakers far too quiet** (~20 dB down) | omarchy's `alsa-soft-mixer.conf` forces `api.alsa.soft-mixer` on for *all* cards, so PipeWire never touches the ALSA mixer and `Master` stays at its driver default **−20.25 dB** | wireplumber fragment turning soft-mixer off for the built-in card only | [`scripts/fix-asus-z13-quiet-speakers.sh`](scripts/fix-asus-z13-quiet-speakers.sh) |
 | **OpenWhispr dictation hotkey "doesn't work"** | Omarchy loads Hyprland config from **Lua only**; legacy `~/.config/hypr/*.conf` files are silently ignored, so the bind OpenWhispr auto-writes there never registers — and its recording indicator opens pinned to one workspace | manual `o.bind` in `bindings.lua` + pin window rule | — (config edits, see [OpenWhispr dictation](#openwhispr-dictation)) |
 
@@ -67,19 +67,15 @@ Crucially, the native scheme expects **logind to do the suspending** on a
 non-docked lid close (`HandleLidSwitchDocked=ignore` is already the systemd
 default for the docked case). Our old drop-in set all `HandleLidSwitch*=ignore`,
 so with it in place, lid close on battery **locked but never suspended** — it
-had to go:
+had to go.
 
-```bash
-sudo bash scripts/setup-clamshell-logind.sh --uninstall   # removes the drop-in
-```
-
-`~/.config/hypr/clamshell.sh` is deleted; [`scripts/clamshell.sh`](scripts/clamshell.sh)
-stays in the repo for history. The dead `bindl`/`exec-once` lines still sit in
-the unread `.conf` files — harmless, but don't copy them anywhere.
-
-Verify after uninstall: `loginctl show-session -p HandleLidSwitch` isn't
-overridden, close the lid with the external monitor attached → panel off &
-machine stays up; without it → lock + suspend.
+Everything is uninstalled and cleaned up (2026-08-22): the drop-in
+`/etc/systemd/logind.conf.d/10-clamshell.conf` is removed (effective
+`HandleLidSwitch` verified back to `suspend`), `~/.config/hypr/clamshell.sh` is
+deleted, and both scripts (`clamshell.sh`, `setup-clamshell-logind.sh`) are
+dropped from `scripts/` — retrieve them from git history if ever needed. The
+dead `bindl`/`exec-once` lines still sit in the unread `.conf` files —
+harmless, but don't copy them anywhere.
 
 ### Quiet speakers
 The one fix here that needs **no root** — it writes a wireplumber fragment into
