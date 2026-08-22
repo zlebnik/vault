@@ -67,7 +67,7 @@ write_state() {  # issue sid worktree phase stage attempts
     > "$STATE.tmp" && mv "$STATE.tmp" "$STATE"
 }
 
-state_get()    { jq -r "$1 // empty" "$STATE" 2>/dev/null; }
+state_get()    { jq -r "$1 // empty" "$STATE" 2>/dev/null || true; }
 state_update() { jq "$1" "$STATE" > "$STATE.tmp" && mv "$STATE.tmp" "$STATE"; }
 clear_state()  { rm -f "$STATE"; }
 
