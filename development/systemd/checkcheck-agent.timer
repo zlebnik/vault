@@ -1,10 +1,11 @@
 [Unit]
-Description=CheckCheck autonomous dev queue (tick every 15 min after previous run ends)
+Description=CheckCheck autonomous dev queue (tick every 5 min after previous run ends)
 
 [Timer]
 OnBootSec=5min
 # Отсчёт от ЗАВЕРШЕНИЯ предыдущего запуска: 3-часовая сессия не породит очередь тиков.
-OnUnitInactiveSec=15min
+# 5 мин: тики ожидания дешёвые (только gh), а обсуждение плана не должно тормозить.
+OnUnitInactiveSec=5min
 Persistent=true
 
 [Install]
