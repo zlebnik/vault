@@ -1,29 +1,51 @@
 # Очередь автономной разработки ЧекЧека
 
 systemd user timer раз в ~15 мин (после конца предыдущего тика) запускает
-`queue-runner.sh`: берёт **ровно одну** issue с лейблом `agent:ready` из
-`checkcheckonline/checkcheck`, разворачивает git worktree и гоняет headless
-`claude -p` полный цикл — ветка → фикс + тесты → self-review → push → PR с
-`Closes #N` → зелёный CI → отработанное Codex-ревью. Merge — за человеком.
+`queue-runner.sh`. Строго **одна** issue за раз, и новая не берётся, пока PR
+текущей не **смержен** (а blocked ждёт человека) — параллелизм поджат во имя
+качества.
+
+## Пайплайн задачи
+
+1. **План.** Агент берёт самую старую issue с `agent:ready` (лейбл → `agent:wip`,
+   worktree с origin/main) и публикует комментарий `🤖 **План #N**`: root cause,
+   точные файлы, тесты, «Не делаю», оценка размера диффа, вопросы. Кода на этой
+   стадии нет.
+2. **Ожидание 👍.** Тики дешёвые (только gh): реакция 👍 на комментарии плана =
+   одобрение; новый человеческий комментарий (не начинающийся с 🤖) → агент
+   корректирует план **правкой того же комментария** и снова ждёт.
+3. **Реализация.** Строго по одобренному плану: ветка `fix/N-<slug>`,
+   минимальный дифф, тесты, push, PR с `Closes #N`, зелёный CI, Codex-ревью,
+   ответы на комментарии мейнтейнера. План поплыл → `AGENT_BLOCKED`, а не
+   импровизация.
+4. **Ожидание merge.** Лейбл `agent:done`, state живёт дальше: каждый тик
+   проверяет новые комментарии в PR (даже после «ок» от Codex) — появились →
+   агент просыпается и отвечает/чинит. Merge (человеком) → state очищен,
+   worktree снесён, очередь свободна.
 
 ## Состояния (лейблы = истина на GitHub)
 
 | Лейбл | Значение |
 |---|---|
 | `agent:ready` | в очереди; поставь его на issue — агент возьмёт |
-| `agent:wip` | в работе; пока есть wip — новых не берём |
-| `agent:done` | PR готов (CI зелёный, Codex отработан), ждёт merge |
-| `agent:blocked` | нужен человек (детали — в комментарии к issue) |
+| `agent:wip` | в работе (план или код) |
+| `agent:done` | PR готов, ждёт merge; **держит очередь** до merge |
+| `agent:blocked` | нужен человек; **держит очередь**. Вернуть агенту: снять blocked, поставить ready — та же сессия продолжит |
 
 Локальный state — `state/current.json` (issue, session_id, worktree, phase,
-attempts). Worktrees — в `/home/zlebnik/Projects/checkcheck/worktrees/<N>`
-(маркер `.agent-queue`); убираются автоматически после merge/close PR.
+stage, attempts, plan_comment_id, pr_url, last_activity_ts). Worktrees — в
+`/home/zlebnik/Projects/checkcheck/worktrees/<N>` (маркер `.agent-queue`);
+убираются автоматически после merge/close PR.
+
+Все комментарии агента на GitHub начинаются с `🤖` — только так он отличим от
+человека (логин один и тот же). Свои комментарии этим символом не начинай.
 
 ## Rate-limit подписки
 
 Детект по тексту «hit your … limit» в результате → backoff 20 мин, задача
-остаётся в очереди, следующий тик делает `claude --resume` той же сессии.
-Провал без rate-limit — до 3 попыток resume, потом `agent:blocked` + комментарий.
+остаётся на месте, следующий тик делает `claude --resume` той же сессии.
+Провал без rate-limit — до 3 попыток resume на стадию, потом `agent:blocked`
++ комментарий.
 
 ## Команды
 
@@ -49,4 +71,5 @@ journalctl --user -u checkcheck-agent -f  # живой лог тиков
 
 Тест state machine без токенов: положить JSON в `state/logs/fake.json` и
 запустить `AGENT_DRY_RUN=1 ./queue-runner.sh` (GitHub не мутируется, claude не
-запускается).
+запускается). Доп. ручки: `AGENT_DRY_RC`, `AGENT_DRY_APPROVED` (0=👍 стоит),
+`AGENT_DRY_FEEDBACK`, `AGENT_DRY_PR_ACTIVITY`.

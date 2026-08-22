@@ -26,6 +26,7 @@ case $cmd in
     echo "Очередь на GitHub:"
     gh issue list -R "$GH_REPO" --label agent:ready --state open || true
     gh issue list -R "$GH_REPO" --label agent:wip --state open || true
+    gh issue list -R "$GH_REPO" --label agent:done --state open || true
     gh issue list -R "$GH_REPO" --label agent:blocked --state open || true
     ;;
   --take)

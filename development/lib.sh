@@ -17,6 +17,10 @@ SESSION_TIMEOUT=10800   # 3h на одну headless-сессию (timeout(1))
 RETRY_BACKOFF=1200      # 20 мин backoff после rate-limit
 NTFY_TOPIC="${NTFY_TOPIC:-}"  # непустой topic -> дублировать уведомления в ntfy.sh/<topic>
 
+# Комментарии агента на GitHub всегда начинаются с этого маркера — только так
+# отличаем их от человеческих (агент и человек пишут под одним логином).
+AGENT_MARK="🤖"
+
 # Allow-лист инструментов headless-сессии. Денай в headless = проваленный tool
 # call: агент его видит и адаптируется. Расширять по мере обнаружения затыков.
 ALLOWED_TOOLS=(
@@ -30,6 +34,7 @@ ALLOWED_TOOLS=(
 )
 
 log() { printf '[%s] %s\n' "$(date +'%F %T')" "$*"; }
+now_iso() { date -u +%FT%TZ; }
 
 notify() {
   local msg=$1
@@ -49,13 +54,16 @@ gh_mut() {
 }
 
 # --- state -------------------------------------------------------------------
+# phase: running | plan_retry | awaiting_plan_approval | impl_retry
+#        | awaiting_merge | blocked | rate_limited
+# stage: plan | implement   (что делает claude-сессия по сути)
 
-write_state() {  # issue sid worktree phase attempts next_retry_at
+write_state() {  # issue sid worktree phase stage attempts
   jq -n --argjson issue "$1" --arg sid "$2" --arg wt "$3" --arg phase "$4" \
-        --argjson attempts "$5" --argjson retry "${6:-0}" \
-        '{issue:$issue, session_id:$sid, worktree:$wt, phase:$phase,
-          attempts:$attempts, next_retry_at:$retry,
-          started_at:(now|todate), pr_url:null}' \
+        --arg stage "$5" --argjson attempts "$6" \
+        '{issue:$issue, session_id:$sid, worktree:$wt, phase:$phase, stage:$stage,
+          attempts:$attempts, next_retry_at:0, started_at:(now|todate),
+          pr_url:null, plan_comment_id:null, last_activity_ts:null}' \
     > "$STATE.tmp" && mv "$STATE.tmp" "$STATE"
 }
 
@@ -63,8 +71,11 @@ state_get()    { jq -r "$1 // empty" "$STATE" 2>/dev/null; }
 state_update() { jq "$1" "$STATE" > "$STATE.tmp" && mv "$STATE.tmp" "$STATE"; }
 clear_state()  { rm -f "$STATE"; }
 
-render_prompt() {  # <template-basename> <issue>
-  sed "s/{{ISSUE}}/$2/g" "$DEV/prompts/$1"
+render_prompt() {  # <template-basename> <issue> [plan_comment_id] [stage]
+  sed -e "s/{{ISSUE}}/$2/g" \
+      -e "s/{{PLAN_COMMENT_ID}}/${3:-unknown}/g" \
+      -e "s/{{STAGE}}/${4:-}/g" \
+      "$DEV/prompts/$1"
 }
 
 # --- запуск claude -----------------------------------------------------------
@@ -91,6 +102,69 @@ run_claude() {  # worktree sid prompt [resume]
       > "$OUT_JSON" 2> "$OUT_ERR" )
 }
 
+# --- работа с планом и комментариями -----------------------------------------
+
+# 0, если на комментарии плана есть хотя бы один 👍.
+plan_approved() {  # comment_id
+  [[ ${AGENT_DRY_RUN:-0} == 1 ]] && return "${AGENT_DRY_APPROVED:-1}"
+  local n
+  n=$(gh api "repos/$GH_REPO/issues/comments/$1/reactions" \
+        --jq '[.[] | select(.content == "+1")] | length' 2>/dev/null || echo 0)
+  (( n > 0 ))
+}
+
+# Последний комментарий агента с планом (fallback, если id не распарсился).
+find_plan_comment() {  # issue -> печатает id или ничего
+  gh api "repos/$GH_REPO/issues/$1/comments" --paginate \
+    --jq "[.[] | select(.body | startswith(\"$AGENT_MARK **План\"))] | last | .id // empty" \
+    2>/dev/null || true
+}
+
+# Кол-во человеческих комментариев к issue после отметки времени.
+# Человеческий = не начинается с 🤖 (агент и человек — один логин).
+new_issue_feedback() {  # issue since_iso -> печатает число
+  [[ ${AGENT_DRY_RUN:-0} == 1 ]] && { echo "${AGENT_DRY_FEEDBACK:-0}"; return; }
+  gh api "repos/$GH_REPO/issues/$1/comments" --paginate --jq \
+    "[.[] | select(.created_at > \"$2\")
+          | select(.body // \"\" | startswith(\"$AGENT_MARK\") | not)] | length" \
+    2>/dev/null || echo 0
+}
+
+# Кол-во новой человеческой активности в PR после отметки времени:
+# обычные комментарии + inline-комментарии + ревью. Исключаем: комментарии
+# агента (🤖), боилерплейт Codex «no major issues» и триггеры «@codex review».
+new_pr_activity() {  # pr_number since_iso -> печатает число
+  [[ ${AGENT_DRY_RUN:-0} == 1 ]] && { echo "${AGENT_DRY_PR_ACTIVITY:-0}"; return; }
+  local pr=$1 since=$2 filt n1 n2 n3
+  filt="[.[] | select((.created_at // .submitted_at // \"\") > \"$since\")
+             | select(.body // \"\" | startswith(\"$AGENT_MARK\") | not)
+             | select(.body // \"\" | contains(\"find any major issues\") | not)
+             | select((.body // \"\" | gsub(\"\\\\s\"; \"\")) != \"@codexreview\")
+             | select((.body // \"\") != \"\")] | length"
+  n1=$(gh api "repos/$GH_REPO/issues/$pr/comments" --paginate --jq "$filt" 2>/dev/null || echo 0)
+  n2=$(gh api "repos/$GH_REPO/pulls/$pr/comments" --paginate --jq "$filt" 2>/dev/null || echo 0)
+  n3=$(gh api "repos/$GH_REPO/pulls/$pr/reviews" --paginate --jq "$filt" 2>/dev/null || echo 0)
+  echo $(( n1 + n2 + n3 ))
+}
+
+# Состояние PR задачи. Выставляет глобалы PR_STATE (MERGED/CLOSED/OPEN/NONE)
+# и PR_NUM/PR_URL. Не вызывать через $(…) — значения нужны вне subshell.
+pr_state() {  # worktree
+  local wt=$1 branch pr
+  PR_STATE=NONE PR_NUM= PR_URL=
+  if [[ ${AGENT_DRY_RUN:-0} == 1 ]]; then
+    PR_NUM=0; PR_URL="(dry-run)"; PR_STATE=${AGENT_DRY_PR_STATE:-OPEN}; return
+  fi
+  branch=$(git -C "$wt" branch --show-current 2>/dev/null || true)
+  [[ -z $branch ]] && return
+  pr=$(gh pr list -R "$GH_REPO" --head "$branch" --state all \
+        --json number,url,state --jq '.[0] // empty' 2>/dev/null)
+  [[ -z $pr ]] && return
+  PR_NUM=$(jq -r .number <<<"$pr")
+  PR_URL=$(jq -r .url <<<"$pr")
+  PR_STATE=$(jq -r .state <<<"$pr")
+}
+
 # --- верификация результата --------------------------------------------------
 
 # 0 = PR открыт и CI зелёный; 1 = PR нет; 2 = CI ещё идёт; 3 = CI красный.
@@ -113,57 +187,84 @@ verify_pr_done() {  # worktree
   return 0
 }
 
-block_issue() {  # reason; использует ISSUE, OUT_ERR
+block_issue() {  # reason; использует ISSUE, OUT_ERR; state ОСТАЁТСЯ (держит очередь)
   local reason=$1 sid wt
   sid=$(state_get .session_id); wt=$(state_get .worktree)
   gh_mut issue edit "$ISSUE" -R "$GH_REPO" \
     --remove-label agent:wip --add-label agent:blocked || true
   gh_mut issue comment "$ISSUE" -R "$GH_REPO" --body "$(printf \
-    '🤖 agent:blocked — %s\n\nworktree: `%s`\nsession: `%s`\nПродолжить руками: `~/vault/development/attach.sh --take`\n\nХвост лога:\n```\n%s\n```' \
-    "$reason" "${wt:-?}" "${sid:-?}" \
+    '%s agent:blocked — %s\n\nworktree: `%s`\nsession: `%s`\nПродолжить руками: `~/vault/development/attach.sh --take`; вернуть агенту: снять agent:blocked и поставить agent:ready.\n\nХвост лога:\n```\n%s\n```' \
+    "$AGENT_MARK" "$reason" "${wt:-?}" "${sid:-?}" \
     "$(tail -c 1500 "${OUT_ERR:-/dev/null}" 2>/dev/null || true)")" || true
   notify "issue #$ISSUE заблокирован: $reason"
-  log "blocked: issue #$ISSUE — $reason"
-  clear_state
+  log "blocked: issue #$ISSUE — $reason (state сохранён, очередь держится)"
+  state_update '.phase="blocked"'
 }
 
-# rc — exit code запуска claude; использует ISSUE, WT, OUT_JSON, OUT_ERR.
-handle_result() {
-  local rc=$1 result vr attempts
-  result=$(jq -r '.result // ""' "$OUT_JSON" 2>/dev/null || echo "")
-
-  # 1. Rate-limit подписки: backoff, attempts не растёт, сессия будет resumed.
+# Общие первые проверки результата claude-сессии. Возвращает 0, если исход
+# уже обработан (rate-limit/blocked), 1 — если решать вызывающему.
+handle_common() {  # использует OUT_JSON/OUT_ERR; выставляет RESULT
+  RESULT=$(jq -r '.result // ""' "$OUT_JSON" 2>/dev/null || echo "")
   if grep -qiE 'hit your (session|weekly|usage) limit|usage limit (reached|exceeded)' \
-       <<<"$result"$'\n'"$(tail -c 2000 "$OUT_ERR" 2>/dev/null || true)"; then
+       <<<"$RESULT"$'\n'"$(tail -c 2000 "$OUT_ERR" 2>/dev/null || true)"; then
     log "rate-limit: backoff $((RETRY_BACKOFF / 60)) мин, resume той же сессии позже"
     state_update ".phase=\"rate_limited\" | .next_retry_at=$(( $(date +%s) + RETRY_BACKOFF ))"
     return 0
   fi
-
-  # 2. Явная блокировка по маркеру агента.
-  if grep -q 'AGENT_BLOCKED' <<<"$result"; then
-    block_issue "$(grep -o 'AGENT_BLOCKED:.*' <<<"$result" | head -1)"
+  if grep -q 'AGENT_BLOCKED' <<<"$RESULT"; then
+    block_issue "$(grep -o 'AGENT_BLOCKED:.*' <<<"$RESULT" | head -1)"
     return 0
   fi
+  return 1
+}
 
-  # 3. Маркеру AGENT_DONE не верим на слово — проверяем PR и CI на GitHub.
+# rc — exit code запуска claude; стадия планирования.
+handle_plan_result() {
+  local rc=$1 cid attempts
+  handle_common && return 0
+  if grep -q 'AGENT_PLAN_POSTED' <<<"$RESULT"; then
+    cid=$(grep -o 'AGENT_PLAN_POSTED COMMENT_ID=[0-9]*' <<<"$RESULT" \
+            | head -1 | grep -o '[0-9]*$' || true)
+    [[ -z $cid && ${AGENT_DRY_RUN:-0} != 1 ]] && cid=$(find_plan_comment "$ISSUE")
+    if [[ -n $cid ]]; then
+      log "план по issue #$ISSUE опубликован (comment $cid) — жду 👍"
+      notify "план по issue #$ISSUE готов — поставь 👍 или прокомментируй"
+      state_update ".phase=\"awaiting_plan_approval\" | .attempts=0 \
+        | .plan_comment_id=\"$cid\" | .last_activity_ts=\"$(now_iso)\" | .next_retry_at=0"
+      return 0
+    fi
+    log "маркер AGENT_PLAN_POSTED есть, но комментарий плана не найден"
+  fi
+  attempts=$(( $(state_get .attempts) + 1 ))
+  if (( attempts >= MAX_ATTEMPTS )); then
+    block_issue "план не опубликован после $attempts попыток (exit=$rc)"
+  else
+    log "план не опубликован (exit=$rc), попытка $attempts/$MAX_ATTEMPTS — resume следующим тиком"
+    state_update ".phase=\"plan_retry\" | .attempts=$attempts | .next_retry_at=0"
+  fi
+}
+
+# rc — exit code запуска claude; стадия реализации (включая PR-feedback).
+handle_impl_result() {
+  local rc=$1 vr attempts
+  handle_common && return 0
   if [[ ${AGENT_DRY_RUN:-0} == 1 ]]; then
-    if grep -q 'AGENT_DONE' <<<"$result"; then vr=0; PR_URL="(dry-run)"; else vr=1; fi
+    if grep -q 'AGENT_DONE' <<<"$RESULT"; then vr=0; PR_URL="(dry-run)"; else vr=1; fi
   else
     vr=0; verify_pr_done "$WT" || vr=$?
   fi
-
   case $vr in
     0)
       gh_mut issue edit "$ISSUE" -R "$GH_REPO" \
-        --remove-label agent:wip --add-label agent:done
+        --remove-label agent:wip --add-label agent:done || true
       notify "issue #$ISSUE готов к merge: $PR_URL"
-      log "done: issue #$ISSUE — $PR_URL"
-      clear_state
+      log "готов к merge: issue #$ISSUE — $PR_URL (state держит очередь до merge)"
+      state_update ".phase=\"awaiting_merge\" | .pr_url=\"$PR_URL\" | .attempts=0 \
+        | .last_activity_ts=\"$(now_iso)\" | .next_retry_at=0"
       ;;
     2)
       log "PR открыт ($PR_URL), CI ещё идёт — дожмём следующим тиком"
-      state_update ".phase=\"failed_retry\" | .pr_url=\"$PR_URL\" | .next_retry_at=0"
+      state_update ".phase=\"impl_retry\" | .pr_url=\"$PR_URL\" | .next_retry_at=0"
       ;;
     *)
       attempts=$(( $(state_get .attempts) + 1 ))
@@ -171,7 +272,7 @@ handle_result() {
         block_issue "нет готового PR после $attempts попыток (exit=$rc)"
       else
         log "неудача (exit=$rc, verify=$vr), попытка $attempts/$MAX_ATTEMPTS — resume следующим тиком"
-        state_update ".phase=\"failed_retry\" | .attempts=$attempts | .next_retry_at=0"
+        state_update ".phase=\"impl_retry\" | .attempts=$attempts | .next_retry_at=0"
       fi
       ;;
   esac
