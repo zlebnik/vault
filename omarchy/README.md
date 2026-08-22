@@ -17,8 +17,9 @@ All root changes are delivered as **self-contained scripts** you run yourself
 | Random **hard freezes** (login screen, on wake) | amdgpu **SMU firmware hang** — `SMU: No response` / `Failed to disable gfxoff!` (27× in logs) | kernel param `amdgpu.gfxoff=0` | [`scripts/fix-amdgpu-gfxoff-freeze.sh`](scripts/fix-amdgpu-gfxoff-freeze.sh) |
 | **Black screen** at boot (system boots fine, panel stays dark) | display bring-up / Panel Self Refresh | kernel param `amdgpu.dcdebugmask=0x10` (disable PSR) | [`scripts/fix-amdgpu-black-screen-psr.sh`](scripts/fix-amdgpu-black-screen-psr.sh) |
 | **Keyboard dead after resume** | keyboard is the detachable **USB dock** (`0b05:1a30`) that intermittently fails to re-init on s2idle wake | udev power-pin + system-sleep rebind hook | [`scripts/fix-asus-z13-keyboard-resume.sh`](scripts/fix-asus-z13-keyboard-resume.sh) |
-| **Clamshell** (lid closed + external monitor → internal panel off, stay awake) | logind suspends on lid before Hyprland can react | logind drop-in `HandleLidSwitch=ignore` + Hyprland lid handling | [`scripts/setup-clamshell-logind.sh`](scripts/setup-clamshell-logind.sh) + [`scripts/clamshell.sh`](scripts/clamshell.sh) |
+| **Clamshell** (lid closed + external monitor → internal panel off, stay awake) | logind suspends on lid before Hyprland can react | ~~logind drop-in + `clamshell.sh`~~ **retired 2026-08-22**: Omarchy handles clamshell natively now, and the old drop-in actively broke suspend — see [Clamshell mode](#clamshell-mode) | [`scripts/setup-clamshell-logind.sh`](scripts/setup-clamshell-logind.sh)` --uninstall` |
 | **Speakers far too quiet** (~20 dB down) | omarchy's `alsa-soft-mixer.conf` forces `api.alsa.soft-mixer` on for *all* cards, so PipeWire never touches the ALSA mixer and `Master` stays at its driver default **−20.25 dB** | wireplumber fragment turning soft-mixer off for the built-in card only | [`scripts/fix-asus-z13-quiet-speakers.sh`](scripts/fix-asus-z13-quiet-speakers.sh) |
+| **OpenWhispr dictation hotkey "doesn't work"** | Omarchy loads Hyprland config from **Lua only**; legacy `~/.config/hypr/*.conf` files are silently ignored, so the bind OpenWhispr auto-writes there never registers — and its recording indicator opens pinned to one workspace | manual `o.bind` in `bindings.lua` + pin window rule | — (config edits, see [OpenWhispr dictation](#openwhispr-dictation)) |
 
 Status: all applied and confirmed working (audio fix 2026-07-26; rest 2026-07-12).
 
@@ -46,32 +47,39 @@ sudo bash scripts/fix-asus-z13-keyboard-resume.sh
 ```
 Recovery events are logged: `journalctl -t asus-keyboard-resume`
 
-### Clamshell mode
-Two parts:
+### Clamshell mode — retired (2026-08-22)
 
-- **`scripts/setup-clamshell-logind.sh`** (root) — installs
-  `/etc/systemd/logind.conf.d/10-clamshell.conf` so the lid stops force-suspending
-  and hands control to Hyprland.
-- **`scripts/clamshell.sh`** — lives at **`~/.config/hypr/clamshell.sh`** (kept
-  here as a reference copy). Decides per lid event:
-  - close + external monitor → disable internal panel (`eDP-1`)
-  - close + no external → suspend
-  - open → re-enable internal panel
-  - `init` (run at startup via `exec-once`) → start in clamshell if booted with
-    the lid already closed + external connected
+The custom setup (logind drop-in + `clamshell.sh` wired to lid-switch binds) is
+**no longer in use**. Two things changed:
+
+1. **The wiring went dead silently.** Omarchy migrated Hyprland config to Lua
+   (`~/.config/hypr/*.lua`); the legacy `bindings.conf` / `autostart.conf`
+   holding the `clamshell.sh` binds stopped being read entirely (see the
+   OpenWhispr section — same gotcha).
+2. **Omarchy now does clamshell natively.** Its default lid binds
+   (`$OMARCHY_PATH/default/hypr/bindings/utilities.lua`) call
+   `omarchy-system-lid-close` / `omarchy-hyprland-monitor-clamshell`, which
+   cover everything `clamshell.sh` did and more: close + external → internal
+   panel off (remembers scale/position), open → panel back on, close + no
+   external → lock; boot/hotplug reconcile via `omarchy-hyprland-monitor-watch`.
+
+Crucially, the native scheme expects **logind to do the suspending** on a
+non-docked lid close (`HandleLidSwitchDocked=ignore` is already the systemd
+default for the docked case). Our old drop-in set all `HandleLidSwitch*=ignore`,
+so with it in place, lid close on battery **locked but never suspended** — it
+had to go:
 
 ```bash
-sudo bash scripts/setup-clamshell-logind.sh
+sudo bash scripts/setup-clamshell-logind.sh --uninstall   # removes the drop-in
 ```
 
-Hyprland wiring (in `~/.config/hypr/`, **not** in this repo):
-```
-# bindings.conf
-bindl = , switch:on:Lid Switch,  exec, $HOME/.config/hypr/clamshell.sh close
-bindl = , switch:off:Lid Switch, exec, $HOME/.config/hypr/clamshell.sh open
-# autostart.conf
-exec-once = $HOME/.config/hypr/clamshell.sh init
-```
+`~/.config/hypr/clamshell.sh` is deleted; [`scripts/clamshell.sh`](scripts/clamshell.sh)
+stays in the repo for history. The dead `bindl`/`exec-once` lines still sit in
+the unread `.conf` files — harmless, but don't copy them anywhere.
+
+Verify after uninstall: `loginctl show-session -p HandleLidSwitch` isn't
+overridden, close the lid with the external monitor attached → panel off &
+machine stays up; without it → lock + suspend.
 
 ### Quiet speakers
 The one fix here that needs **no root** — it writes a wireplumber fragment into
@@ -105,6 +113,59 @@ Gotchas worth remembering:
 Verify: `pactl list sinks | grep Flags:` must include **`HW_VOLUME_CTRL`**, and
 `amixer -c1 sget Master` must reach `[0.00dB]` at 100% volume (the bug pins it at
 `60 [69%] [-20.25dB]`).
+
+### OpenWhispr dictation
+
+Local voice typing (Russian works well): **`openwhispr-vulkan`** from the AUR,
+model `large-v3-turbo`, Vulkan backend confirmed running on the Radeon 8060S.
+Hotkey: **CTRL+SHIFT+SPACE** toggles recording; text is auto-pasted via `wtype`.
+
+Setting it up meant re-doing the app's broken Hyprland integration by hand
+(all edits in `~/.config/hypr/`, **not** in this repo):
+
+- **The hotkey silently doesn't register.** Omarchy configures Hyprland in
+  **Lua** (`hyprland.lua`, `bindings.lua`, …); the legacy `hyprland.conf` /
+  `bindings.conf` / `autostart.conf` still sit in `~/.config/hypr/` but are
+  **never loaded** (`hyprctl binds` shows every bind with dispatcher `__lua`).
+  OpenWhispr's Hyprland integration appends
+  `source = ./openwhispr-binds.conf` to `hyprland.conf` — into the void, and it
+  re-appends it on every app restart. Fix in `bindings.lua`:
+
+  ```lua
+  o.bind(
+    "CTRL + SHIFT + SPACE",
+    "Dictation (OpenWhispr)",
+    "dbus-send --session --type=method_call --dest=com.openwhispr.App /com/openwhispr/App com.openwhispr.App.Toggle"
+  )
+  ```
+
+- **The recording indicator hides on one workspace.** The "Voice Recorder"
+  window (120×120 floating) opens on whatever workspace the app started on and
+  stays there — so the hotkey *looks* dead: recording toggles with zero visual
+  feedback. Fix in `hyprland.lua`:
+
+  ```lua
+  o.window({ class = "open-whispr", title = "Voice Recorder" }, {
+    float = true,
+    pin = true,      -- visible on every workspace
+    no_focus = true, -- focus must stay in the window receiving the text
+  })
+  ```
+
+Debugging gotchas from that session:
+
+- **`wtype` cannot trigger Hyprland binds** (virtual-keyboard input bypasses
+  them here) — test binds with a physical keypress, e.g. a temporary
+  `o.bind(..., "touch /tmp/marker")`.
+- The **"Wayland Paste Setup" warning about ydotool is a false alarm** on
+  Hyprland: the app's paste code tries `wtype` first on wlroots compositors and
+  only falls back to ydotool. Safe to dismiss (it reappears each launch unless
+  ydotool is fully set up).
+- Useful checks: `omarchy menu keybindings --print` (is the bind live),
+  `sqlite3 ~/.config/open-whispr/transcriptions.db "select * from transcriptions"`
+  (did transcription happen at all), and
+  `dbus-send --session --print-reply --dest=com.openwhispr.App /com/openwhispr/App com.openwhispr.App.Toggle`
+  (does the app answer).
 
 ## Notes
 - The two amdgpu params are workarounds for early Strix Halo firmware/driver bugs;
