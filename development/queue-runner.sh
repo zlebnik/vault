@@ -64,7 +64,7 @@ if [[ -s $STATE ]]; then
       ;;
 
     awaiting_merge)
-      pr_state "$WT"
+      pr_state "$WT" "$(state_get .pr_num)"
       case $PR_STATE in
         MERGED)
           notify "PR issue #$ISSUE смержен — очередь свободна"

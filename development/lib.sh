@@ -149,16 +149,22 @@ new_pr_activity() {  # pr_number since_iso -> печатает число
 
 # Состояние PR задачи. Выставляет глобалы PR_STATE (MERGED/CLOSED/OPEN/NONE)
 # и PR_NUM/PR_URL. Не вызывать через $(…) — значения нужны вне subshell.
-pr_state() {  # worktree
-  local wt=$1 branch pr
+# Если известен номер PR — ищем по нему (worktree может уже не существовать);
+# иначе по ветке worktree.
+pr_state() {  # worktree [pr_num]
+  local wt=$1 num=${2:-} branch pr
   PR_STATE=NONE PR_NUM= PR_URL=
   if [[ ${AGENT_DRY_RUN:-0} == 1 ]]; then
     PR_NUM=0; PR_URL="(dry-run)"; PR_STATE=${AGENT_DRY_PR_STATE:-OPEN}; return
   fi
-  branch=$(git -C "$wt" branch --show-current 2>/dev/null || true)
-  [[ -z $branch ]] && return
-  pr=$(gh pr list -R "$GH_REPO" --head "$branch" --state all \
-        --json number,url,state --jq '.[0] // empty' 2>/dev/null)
+  if [[ -n $num ]]; then
+    pr=$(gh pr view "$num" -R "$GH_REPO" --json number,url,state 2>/dev/null || true)
+  else
+    branch=$(git -C "$wt" branch --show-current 2>/dev/null || true)
+    [[ -z $branch ]] && return
+    pr=$(gh pr list -R "$GH_REPO" --head "$branch" --state all \
+          --json number,url,state --jq '.[0] // empty' 2>/dev/null)
+  fi
   [[ -z $pr ]] && return
   PR_NUM=$(jq -r .number <<<"$pr")
   PR_URL=$(jq -r .url <<<"$pr")
@@ -259,7 +265,8 @@ handle_impl_result() {
         --remove-label agent:wip --add-label agent:done || true
       notify "issue #$ISSUE готов к merge: $PR_URL"
       log "готов к merge: issue #$ISSUE — $PR_URL (state держит очередь до merge)"
-      state_update ".phase=\"awaiting_merge\" | .pr_url=\"$PR_URL\" | .attempts=0 \
+      state_update ".phase=\"awaiting_merge\" | .pr_url=\"$PR_URL\" \
+        | .pr_num=${PR_NUM:-0} | .attempts=0 \
         | .last_activity_ts=\"$(now_iso)\" | .next_retry_at=0"
       ;;
     2)
@@ -282,9 +289,13 @@ handle_impl_result() {
 
 # Сносим только worktrees, созданные очередью (маркер .agent-queue),
 # и только когда их PR смержен или закрыт. Blocked (без PR) не трогаем.
+# Worktree АКТИВНОЙ задачи не трогаем тоже: финал (merge/close) должна увидеть
+# и обработать state machine, иначе awaiting_merge найдёт NONE вместо MERGED.
 cleanup_finished_worktrees() {
-  local wt br st
+  local wt br st active
+  active=$(state_get .worktree)
   for wt in "$WORKTREES_DIR"/*/; do
+    [[ -n $active && ${wt%/} == "${active%/}" ]] && continue
     [[ -f "$wt/.agent-queue" ]] || continue
     br=$(git -C "$wt" branch --show-current 2>/dev/null) || continue
     [[ -z $br ]] && continue
