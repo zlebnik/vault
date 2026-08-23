@@ -41,22 +41,23 @@ if [[ -s $STATE ]]; then
   fi
 
   # Issue закрыли, пока задача ждала (план «без кода», закрыл человек и т.п.):
-  # это конец задачи в любой ждущей фазе, 👍/merge уже не будет.
-  if [[ $phase == awaiting_plan_approval || $phase == awaiting_merge ]] \
-     && [[ $(issue_state "$ISSUE") == CLOSED ]]; then
+  # конец задачи, 👍/merge уже не будет. В awaiting_merge вызывается только
+  # после проверки PR — merge с «Closes #N» закрывает issue одновременно.
+  finish_closed_issue() {
     log "issue #$ISSUE закрыта (phase=$phase) — задача завершена, state очищен"
     if issue_has_label "$ISSUE" agent:wip; then
       gh_mut issue edit "$ISSUE" -R "$GH_REPO" --remove-label agent:wip --add-label agent:done
     fi
     notify "issue #$ISSUE закрыта без merge — очередь свободна"
     clear_state
-    exit 0
-  fi
+  }
 
   case $phase in
     awaiting_plan_approval)
       cid=$(state_get .plan_comment_id)
-      if plan_approved "$cid"; then
+      if [[ $(issue_state "$ISSUE") == CLOSED ]]; then
+        finish_closed_issue
+      elif plan_approved "$cid"; then
         log "план по issue #$ISSUE одобрен (👍) — начинаю реализацию"
         state_update '.stage="implement" | .phase="running" | .attempts=0'
         rc=0
@@ -85,6 +86,11 @@ if [[ -s $STATE ]]; then
           clear_state
           ;;
         OPEN)
+          if [[ $(issue_state "$ISSUE") == CLOSED ]]; then
+            log "issue #$ISSUE закрыта, а PR #$PR_NUM ещё открыт — закрой или смержи его руками"
+            finish_closed_issue
+            exit 0
+          fi
           act=$(new_pr_activity "$PR_NUM" "$(state_get .last_activity_ts)")
           if (( act > 0 )); then
             log "в PR #$PR_NUM новая активность ($act) — отдаю агенту"
@@ -98,9 +104,13 @@ if [[ -s $STATE ]]; then
           fi
           ;;
         *)
-          notify "PR issue #$ISSUE: $PR_STATE без merge — state очищен, разберись с лейблами"
-          log "PR в состоянии $PR_STATE — state очищен"
-          clear_state
+          if [[ $(issue_state "$ISSUE") == CLOSED ]]; then
+            finish_closed_issue
+          else
+            notify "PR issue #$ISSUE: $PR_STATE без merge — state очищен, разберись с лейблами"
+            log "PR в состоянии $PR_STATE — state очищен"
+            clear_state
+          fi
           ;;
       esac
       ;;
