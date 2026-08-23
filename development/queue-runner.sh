@@ -40,6 +40,19 @@ if [[ -s $STATE ]]; then
     exit 0
   fi
 
+  # Issue закрыли, пока задача ждала (план «без кода», закрыл человек и т.п.):
+  # это конец задачи в любой ждущей фазе, 👍/merge уже не будет.
+  if [[ $phase == awaiting_plan_approval || $phase == awaiting_merge ]] \
+     && [[ $(issue_state "$ISSUE") == CLOSED ]]; then
+    log "issue #$ISSUE закрыта (phase=$phase) — задача завершена, state очищен"
+    if issue_has_label "$ISSUE" agent:wip; then
+      gh_mut issue edit "$ISSUE" -R "$GH_REPO" --remove-label agent:wip --add-label agent:done
+    fi
+    notify "issue #$ISSUE закрыта без merge — очередь свободна"
+    clear_state
+    exit 0
+  fi
+
   case $phase in
     awaiting_plan_approval)
       cid=$(state_get .plan_comment_id)

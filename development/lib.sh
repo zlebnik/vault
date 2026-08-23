@@ -110,6 +110,19 @@ run_claude() {  # worktree sid prompt [resume]
       > "$OUT_JSON" 2> "$OUT_ERR" )
 }
 
+# --- issue на GitHub ---------------------------------------------------------
+
+issue_state() {  # issue → OPEN | CLOSED | ? (dry: AGENT_DRY_ISSUE_STATE)
+  [[ ${AGENT_DRY_RUN:-0} == 1 ]] && { echo "${AGENT_DRY_ISSUE_STATE:-OPEN}"; return; }
+  gh issue view "$1" -R "$GH_REPO" --json state --jq .state 2>/dev/null || echo "?"
+}
+
+issue_has_label() {  # issue label → 0 если стоит
+  [[ ${AGENT_DRY_RUN:-0} == 1 ]] && return 1
+  gh issue view "$1" -R "$GH_REPO" --json labels --jq '.labels[].name' 2>/dev/null \
+    | grep -qx "$2"
+}
+
 # --- работа с планом и комментариями -----------------------------------------
 
 # 0, если на комментарии плана есть хотя бы один 👍.

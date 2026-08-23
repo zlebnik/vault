@@ -79,4 +79,4 @@ find_organizations/projects/teams) — не заводи его. `MAX_ATTEMPTS`,
 Тест state machine без токенов: положить JSON в `state/logs/fake.json` и
 запустить `AGENT_DRY_RUN=1 ./queue-runner.sh` (GitHub не мутируется, claude не
 запускается). Доп. ручки: `AGENT_DRY_RC`, `AGENT_DRY_APPROVED` (0=👍 стоит),
-`AGENT_DRY_FEEDBACK`, `AGENT_DRY_PR_ACTIVITY`.
+`AGENT_DRY_FEEDBACK`, `AGENT_DRY_PR_ACTIVITY`, `AGENT_DRY_ISSUE_STATE` (CLOSED).
