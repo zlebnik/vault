@@ -71,7 +71,11 @@ journalctl --user -u checkcheck-agent -f  # живой лог тиков
 `execute_sentry_tool` — агент Sentry только читает). Sentry MCP живёт в
 user-scope `~/.claude.json` с org-scoped URL `…/mcp/checkcheck`; локальный
 override в клоне checkcheck с URL без org ломает каталог (остаются только
-find_organizations/projects/teams) — не заводи его. `MAX_ATTEMPTS`, `SESSION_TIMEOUT` (3ч),
+find_organizations/projects/teams) — не заводи его. Модели по стадиям:
+`MODEL_PLAN` (`claude-fable-5[1m]`) и `MODEL_IMPLEMENT` (`opus`) — план думает
+Fable, код пишет Opus, это экономит окно подписки; пустая строка = дефолт из
+`~/.claude/settings.json`. Resume той же сессии с другой моделью корректен —
+история сохраняется. `MAX_ATTEMPTS`, `SESSION_TIMEOUT` (3ч),
 `RETRY_BACKOFF` (20 мин), `NTFY_TOPIC` (пусто = выключено). Уведомления: push из
 самой сессии (PushNotification tool), `notify-send` и комментарии в issue от
 раннера.

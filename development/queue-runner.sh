@@ -24,7 +24,7 @@ resume_by_stage() {  # запустить resume текущей сессии и 
   log "resume issue #$ISSUE (stage=$stage, session=$SID)"
   state_update '.phase="running"'
   run_claude "$WT" "$SID" \
-    "$(render_prompt resume.md "$ISSUE" "$(state_get .plan_comment_id)" "$stage")" resume || rc=$?
+    "$(render_prompt resume.md "$ISSUE" "$(state_get .plan_comment_id)" "$stage")" resume "$stage" || rc=$?
   if [[ $stage == plan ]]; then handle_plan_result "$rc"; else handle_impl_result "$rc"; fi
 }
 
@@ -61,7 +61,7 @@ if [[ -s $STATE ]]; then
         log "план по issue #$ISSUE одобрен (👍) — начинаю реализацию"
         state_update '.stage="implement" | .phase="running" | .attempts=0'
         rc=0
-        run_claude "$WT" "$SID" "$(render_prompt implement.md "$ISSUE" "$cid")" resume || rc=$?
+        run_claude "$WT" "$SID" "$(render_prompt implement.md "$ISSUE" "$cid")" resume implement || rc=$?
         handle_impl_result "$rc"
       else
         fb=$(new_issue_feedback "$ISSUE" "$(state_get .last_activity_ts)")
@@ -69,7 +69,7 @@ if [[ -s $STATE ]]; then
           log "по плану issue #$ISSUE есть новые комментарии ($fb) — корректирую план"
           state_update '.phase="running"'
           rc=0
-          run_claude "$WT" "$SID" "$(render_prompt revise.md "$ISSUE" "$cid")" resume || rc=$?
+          run_claude "$WT" "$SID" "$(render_prompt revise.md "$ISSUE" "$cid")" resume plan || rc=$?
           handle_plan_result "$rc"
         else
           log "план issue #$ISSUE ждёт 👍 — пропуск тика без claude"
@@ -97,7 +97,7 @@ if [[ -s $STATE ]]; then
             state_update '.phase="running"'
             rc=0
             run_claude "$WT" "$SID" \
-              "$(render_prompt pr-feedback.md "$ISSUE" "$(state_get .plan_comment_id)")" resume || rc=$?
+              "$(render_prompt pr-feedback.md "$ISSUE" "$(state_get .plan_comment_id)")" resume implement || rc=$?
             handle_impl_result "$rc"
           else
             log "PR #$PR_NUM ждёт merge — пропуск тика без claude"
@@ -200,5 +200,5 @@ SID=$(uuidgen)
 write_state "$ISSUE" "$SID" "$WT" running plan 0
 log "запуск claude -p, стадия плана (session=$SID, worktree=$WT)"
 rc=0
-run_claude "$WT" "$SID" "$(render_prompt plan.md "$ISSUE")" || rc=$?
+run_claude "$WT" "$SID" "$(render_prompt plan.md "$ISSUE")" new plan || rc=$?
 handle_plan_result "$rc"

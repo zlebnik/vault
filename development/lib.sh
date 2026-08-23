@@ -14,6 +14,12 @@ LOGS="$STATE_DIR/logs"
 
 MAX_ATTEMPTS=3
 SESSION_TIMEOUT=10800   # 3h на одну headless-сессию (timeout(1))
+
+# Модели по стадиям: план — Fable (анализ, Sentry, root cause), код — Opus
+# (экономит окно подписки). Пустая строка = дефолт из ~/.claude/settings.json.
+# resume той же сессии с другой моделью работает: история сохраняется.
+MODEL_PLAN="claude-fable-5[1m]"
+MODEL_IMPLEMENT="opus"
 RETRY_BACKOFF=1200      # 20 мин backoff после rate-limit
 NTFY_TOPIC="${NTFY_TOPIC:-}"  # непустой topic -> дублировать уведомления в ntfy.sh/<topic>
 
@@ -88,8 +94,8 @@ render_prompt() {  # <template-basename> <issue> [plan_comment_id] [stage]
 # --- запуск claude -----------------------------------------------------------
 
 # Использует глобалы ISSUE; выставляет OUT_JSON/OUT_ERR.
-run_claude() {  # worktree sid prompt [resume]
-  local wt=$1 sid=$2 prompt=$3 mode=${4:-new}
+run_claude() {  # worktree sid prompt [resume] [stage]
+  local wt=$1 sid=$2 prompt=$3 mode=${4:-new} stage=${5:-}
   local ts; ts=$(date +%s)
   OUT_JSON="$LOGS/issue-$ISSUE-$ts.json"
   OUT_ERR="$LOGS/issue-$ISSUE-$ts.log"
@@ -103,6 +109,12 @@ run_claude() {  # worktree sid prompt [resume]
   else
     args+=(--session-id "$sid")
   fi
+  local model=""
+  case $stage in
+    plan)      model=$MODEL_PLAN ;;
+    implement) model=$MODEL_IMPLEMENT ;;
+  esac
+  [[ -n $model ]] && args+=(--model "$model")
   args+=(--allowedTools "${ALLOWED_TOOLS[@]}")
   args+=(--disallowedTools "${DISALLOWED_TOOLS[@]}")
   ( cd "$wt" && CLAUDE_CODE_RETRY_WATCHDOG=1 \
