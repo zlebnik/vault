@@ -20,18 +20,30 @@ Context:
 Steps:
 1. `gh issue view {{ISSUE}} --comments`. Read the relevant code, docs/,
    guidelines/ and guardrails/ until you understand the root cause.
-2. Draft the plan. Hard requirements (guardrails/scope-and-decisions.md):
+2. Check production reality in Sentry (MCP server `sentry`, org `checkcheck`,
+   project `python-django`; read-only — never resolve/assign/ignore issues):
+   `mcp__sentry__search_issues` / `search_events` for the exception, view,
+   task or endpoint from the issue; `get_sentry_resource` for the stack trace
+   and tags of the relevant Sentry issue (`analyze_issue_with_seer` only for
+   a genuinely confusing trace). Use it to answer with FACTS the questions
+   you would otherwise have to assume: does the error actually happen in
+   prod, how often, since which release, with what inputs. No match in
+   Sentry is also a fact — say so. Keep this to a few targeted queries.
+3. Draft the plan. Hard requirements (guardrails/scope-and-decisions.md):
    - The SMALLEST diff that resolves the issue and covers it with tests.
      Diff size is a design constraint — no compat shims for values a data
      migration rewrites, no defensive code for hypothetical states.
    - If anything depends on the state of production data or on a product
-     decision — do NOT design around it. Put it in the «Вопросы» section with
-     a recommended answer, and keep the plan itself to the no-assumptions
+     decision — do NOT design around it. First try to settle it from Sentry
+     (step 2); what Sentry cannot answer goes into the «Вопросы» section with
+     a recommended answer, and the plan itself stays the no-assumptions
      variant.
-3. Write the plan body to `.agent-plan.md` in the worktree root (this file is
+4. Write the plan body to `.agent-plan.md` in the worktree root (this file is
    never staged or committed). Plan format, in Russian, body starting exactly
    with `🤖 **План #{{ISSUE}}**`:
-   - **Проблема** — root cause in 1–3 sentences.
+   - **Проблема** — root cause in 1–3 sentences; cite the Sentry issue
+     short id(s) and frequency if found (`PYTHON-DJANGO-XXX`, N events /
+     M users за период), or «в Sentry не встречается».
    - **Изменения** — exact file paths and what changes in each.
    - **Тесты** — which existing test module is extended, which invariants are
      asserted (one-shot self-verification tests are forbidden — see
@@ -39,9 +51,9 @@ Steps:
    - **Не делаю** — adjacent things deliberately left out of scope.
    - **Ожидаемый размер** — rough LOC estimate of the final diff.
    - **Вопросы** — only if genuinely needed; each with a recommended answer.
-4. Post it and capture the comment id:
+5. Post it and capture the comment id:
    `gh api "repos/checkcheckonline/checkcheck/issues/{{ISSUE}}/comments" -F body=@.agent-plan.md --jq .id`
-5. Send a push notification via PushNotification: «План по issue #{{ISSUE}}
+6. Send a push notification via PushNotification: «План по issue #{{ISSUE}}
    готов — жду 👍».
 
 Hard constraints:

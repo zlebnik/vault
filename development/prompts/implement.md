@@ -31,7 +31,9 @@ Step by step:
    parens, body explaining root cause and design, trailer:
    `Co-Authored-By: Claude <model> <noreply@anthropic.com>`
 4. Push the branch (`git push -u origin <branch>`) and open a PR whose body
-   ends with `Closes #{{ISSUE}}`.
+   ends with `Closes #{{ISSUE}}`. If the plan cites a Sentry issue, mention
+   its short id in the PR body (the maintainer resolves it after deploy —
+   you never touch Sentry issue status yourself).
 5. Watch CI in the FOREGROUND: `gh pr checks <pr> --watch`. If red — diagnose,
    fix, push, repeat. Nothing re-invokes you after your turn ends — background
    waits are useless; never end the turn "to wait" for something.

@@ -10,7 +10,9 @@ systemd user timer раз в ~5 мин (после конца предыдуще
 1. **План.** Агент берёт самую старую issue с `agent:ready` (лейбл → `agent:wip`,
    worktree с origin/main) и публикует комментарий `🤖 **План #N**`: root cause,
    точные файлы, тесты, «Не делаю», оценка размера диффа, вопросы. Кода на этой
-   стадии нет.
+   стадии нет. Перед планом агент сверяется с **Sentry** (MCP `sentry`, org
+   `checkcheck`, проект `python-django`): есть ли ошибка в проде, как часто, с
+   какими входами — чтобы в плане были факты, а не гипотезы о прод-данных.
 2. **Ожидание 👍.** Тики дешёвые (только gh): реакция 👍 на комментарии плана =
    одобрение; новый человеческий комментарий (не начинающийся с 🤖) → агент
    корректирует план **правкой того же комментария** и снова ждёт.
@@ -64,7 +66,12 @@ journalctl --user -u checkcheck-agent -f  # живой лог тиков
 ## Настройка
 
 Всё в шапке `lib.sh`: пути, `ALLOWED_TOOLS` (allow-лист headless-сессии —
-расширяй, если агент упирается в денай), `MAX_ATTEMPTS`, `SESSION_TIMEOUT` (3ч),
+расширяй, если агент упирается в денай; `mcp__sentry` целиком) и
+`DISALLOWED_TOOLS` (deny сильнее allow: `update_issue` и универсальный
+`execute_sentry_tool` — агент Sentry только читает). Sentry MCP живёт в
+user-scope `~/.claude.json` с org-scoped URL `…/mcp/checkcheck`; локальный
+override в клоне checkcheck с URL без org ломает каталог (остаются только
+find_organizations/projects/teams) — не заводи его. `MAX_ATTEMPTS`, `SESSION_TIMEOUT` (3ч),
 `RETRY_BACKOFF` (20 мин), `NTFY_TOPIC` (пусто = выключено). Уведомления: push из
 самой сессии (PushNotification tool), `notify-send` и комментарии в issue от
 раннера.

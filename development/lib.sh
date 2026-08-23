@@ -31,7 +31,14 @@ ALLOWED_TOOLS=(
   "Bash(mkdir:*)" "Bash(touch:*)" "Bash(sleep:*)" "Bash(python3:*)"
   "Bash(./venv/bin/python:*)" "Bash(./venv/bin/black:*)"
   "Bash(DEBUG=true ./venv/bin/python:*)"
+  # Sentry MCP (user-scope ~/.claude.json, org checkcheck): весь сервер,
+  # кроме мутаций — см. DISALLOWED_TOOLS.
+  mcp__sentry
 )
+# Deny важнее allow: агент читает Sentry, но не резолвит/назначает issues.
+# execute_sentry_tool — универсальный исполнитель каталога (в т.ч. update_issue
+# в обход прямого deny), поэтому тоже закрыт: прямых read-инструментов хватает.
+DISALLOWED_TOOLS=(mcp__sentry__update_issue mcp__sentry__execute_sentry_tool)
 
 log() { printf '[%s] %s\n' "$(date +'%F %T')" "$*"; }
 now_iso() { date -u +%FT%TZ; }
@@ -97,6 +104,7 @@ run_claude() {  # worktree sid prompt [resume]
     args+=(--session-id "$sid")
   fi
   args+=(--allowedTools "${ALLOWED_TOOLS[@]}")
+  args+=(--disallowedTools "${DISALLOWED_TOOLS[@]}")
   ( cd "$wt" && CLAUDE_CODE_RETRY_WATCHDOG=1 \
       timeout --kill-after=60 "$SESSION_TIMEOUT" "$CLAUDE_BIN" "${args[@]}" \
       > "$OUT_JSON" 2> "$OUT_ERR" )
