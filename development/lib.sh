@@ -196,15 +196,21 @@ pr_state() {  # worktree [pr_num]
 
 # 0 = PR открыт и CI зелёный; 1 = PR нет; 2 = CI ещё идёт; 3 = CI красный.
 # Выставляет PR_NUM/PR_URL при наличии PR.
+# Коды: 0 готов (PR_STATE=OPEN с зелёным CI или уже MERGED), 1 нет PR / PR
+# закрыт без merge, 2 CI ещё идёт, 3 CI красный. Выставляет PR_NUM/PR_URL/PR_STATE.
 verify_pr_done() {  # worktree
   local wt=$1 branch pr buckets fail pending
   branch=$(git -C "$wt" branch --show-current 2>/dev/null || true)
   [[ -z $branch ]] && return 1
-  pr=$(gh pr list -R "$GH_REPO" --head "$branch" --state open \
-        --json number,url --jq '.[0] // empty')
+  # Мейнтейнер мог смержить PR, пока сессия ещё ждала Codex — ищем в любом состоянии.
+  pr=$(gh pr list -R "$GH_REPO" --head "$branch" --state all \
+        --json number,url,state --jq 'sort_by(.number) | last // empty')
   [[ -z $pr ]] && return 1
   PR_NUM=$(jq -r .number <<<"$pr")
   PR_URL=$(jq -r .url <<<"$pr")
+  PR_STATE=$(jq -r .state <<<"$pr")
+  [[ $PR_STATE == MERGED ]] && return 0
+  [[ $PR_STATE != OPEN ]] && return 1
   buckets=$(gh pr checks "$PR_NUM" -R "$GH_REPO" --json bucket \
               --jq '[.[].bucket]' 2>/dev/null || echo '[]')
   fail=$(jq '[.[] | select(. == "fail")] | length' <<<"$buckets")
@@ -272,6 +278,24 @@ handle_plan_result() {
 }
 
 # rc — exit code запуска claude; стадия реализации (включая PR-feedback).
+# PR готов (verify_pr_done=0; использует PR_URL/PR_NUM/PR_STATE): лейбл done,
+# уже MERGED → задача закрыта сразу, иначе awaiting_merge.
+finish_impl_done() {
+  gh_mut issue edit "$ISSUE" -R "$GH_REPO" \
+    --remove-label agent:wip --add-label agent:done || true
+  if [[ ${PR_STATE:-} == MERGED ]]; then
+    notify "PR issue #$ISSUE смержен — очередь свободна"
+    log "PR $PR_URL уже смержен: issue #$ISSUE закрыта, state очищен"
+    clear_state
+    return 0
+  fi
+  notify "issue #$ISSUE готов к merge: $PR_URL"
+  log "готов к merge: issue #$ISSUE — $PR_URL (state держит очередь до merge)"
+  state_update ".phase=\"awaiting_merge\" | .pr_url=\"$PR_URL\" \
+    | .pr_num=${PR_NUM:-0} | .attempts=0 \
+    | .last_activity_ts=\"$(now_iso)\" | .next_retry_at=0"
+}
+
 handle_impl_result() {
   local rc=$1 vr attempts
   handle_common && return 0
@@ -281,15 +305,7 @@ handle_impl_result() {
     vr=0; verify_pr_done "$WT" || vr=$?
   fi
   case $vr in
-    0)
-      gh_mut issue edit "$ISSUE" -R "$GH_REPO" \
-        --remove-label agent:wip --add-label agent:done || true
-      notify "issue #$ISSUE готов к merge: $PR_URL"
-      log "готов к merge: issue #$ISSUE — $PR_URL (state держит очередь до merge)"
-      state_update ".phase=\"awaiting_merge\" | .pr_url=\"$PR_URL\" \
-        | .pr_num=${PR_NUM:-0} | .attempts=0 \
-        | .last_activity_ts=\"$(now_iso)\" | .next_retry_at=0"
-      ;;
+    0) finish_impl_done ;;
     2)
       log "PR открыт ($PR_URL), CI ещё идёт — дожмём следующим тиком"
       state_update ".phase=\"impl_retry\" | .pr_url=\"$PR_URL\" | .next_retry_at=0"

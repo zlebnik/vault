@@ -138,12 +138,15 @@ if [[ -s $STATE ]]; then
 
     *)
       # rate_limited / plan_retry / impl_retry / running (прошлый тик умер).
-      # Экономия лимита: если PR уже есть и CI ещё крутится — claude не дёргаем.
-      if [[ $(state_get .stage) == implement && -n $(state_get .pr_url) \
-            && ${AGENT_DRY_RUN:-0} != 1 ]]; then
+      # Экономия лимита: если PR уже есть — смотрим на него сами, claude не
+      # дёргаем: CI крутится → ждём; зелёный/смержен → задача готова без сессии.
+      if [[ $(state_get .stage) == implement && ${AGENT_DRY_RUN:-0} != 1 ]]; then
         vr=0; verify_pr_done "$WT" || vr=$?
         if (( vr == 2 )); then
-          log "PR $(state_get .pr_url): CI ещё идёт — пропуск тика без claude"
+          log "PR $PR_URL: CI ещё идёт — пропуск тика без claude"
+          exit 0
+        elif (( vr == 0 )); then
+          finish_impl_done
           exit 0
         fi
       fi

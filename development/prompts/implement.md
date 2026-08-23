@@ -38,9 +38,12 @@ Step by step:
    fix, push, repeat. Nothing re-invokes you after your turn ends — background
    waits are useless; never end the turn "to wait" for something.
 6. Wait for the Codex auto-review (inline comments or a 👍 reaction on the
-   PR). Poll every ~2 minutes for up to 20 minutes:
-   `gh pr view <pr> --comments` and
-   `gh api repos/checkcheckonline/checkcheck/issues/<pr>/reactions`.
+   PR). Poll every ~2 minutes for up to 20 minutes, checking ALL THREE each
+   round — a 👍 reaction alone means «no findings», stop waiting on it:
+   `gh pr view <pr> --comments`,
+   `gh api repos/checkcheckonline/checkcheck/issues/<pr>/reactions`,
+   `gh pr view <pr> --json state` — if the maintainer already merged (state
+   MERGED), stop waiting and go straight to the final message.
    Handle findings per guardrails/workflow.md: verify each against the code;
    a fix for a finding should normally remove or correct code, not add a new
    special case — if findings keep growing the diff, question the premise
