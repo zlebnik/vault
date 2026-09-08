@@ -5,6 +5,7 @@ status: done
 url: https://www.instagram.com/reel/DYdfWaGzabu/
 author: mattwest_roadtoaesthetics
 captured: 2026-05-18T01:00:00.000Z
+_organized: true
 ---
 
 # Ванильный лябне с высоким содержанием белка

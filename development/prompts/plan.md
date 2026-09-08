@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 You are running fully autonomously and headless (`claude -p`, no human present).
 OVERRIDE for this session, superseding the "Claude Code specifics" of CLAUDE.md:
 do NOT use plan mode, do NOT use AskUserQuestion, do NOT delegate to subagents.

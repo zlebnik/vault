@@ -5,6 +5,7 @@ status: done
 url: https://www.instagram.com/reel/DbGJ-spIy-o/
 author: vladlenafit
 captured: 2026-07-22T13:13:49.000Z
+_organized: true
 ---
 
 # Пельмени из куриного фарша на похудении

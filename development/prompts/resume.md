@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 You are resuming an interrupted autonomous session for GitHub issue #{{ISSUE}}
 in the checkcheck repo — same worktree, same rules and OVERRIDES as before:
 headless, no plan mode, no AskUserQuestion, no subagents; AGENTS.md and all
