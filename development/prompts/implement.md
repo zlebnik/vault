@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 STAGE 2 (IMPLEMENTATION) for GitHub issue #{{ISSUE}}: the maintainer approved
 your plan with a 👍. Same rules and OVERRIDES as before: headless, no plan
 mode, no AskUserQuestion, no subagents; AGENTS.md and every guardrails/*.md

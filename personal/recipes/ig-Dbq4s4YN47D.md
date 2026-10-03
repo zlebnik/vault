@@ -5,6 +5,7 @@ status: done
 url: https://www.instagram.com/reel/Dbq4s4YN47D/
 author: mark.trener
 captured: 2026-08-05T19:25:05.000Z
+_organized: true
 ---
 
 # Творожные лодочки с сыром и яйцом  

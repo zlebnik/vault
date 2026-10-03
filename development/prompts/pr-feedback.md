@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 The PR for GitHub issue #{{ISSUE}} was already finished (CI green, Codex
 handled) and is awaiting merge — but NEW activity appeared on it. Same rules
 and OVERRIDES as before: headless, no plan mode, no AskUserQuestion, no

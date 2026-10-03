@@ -1,5 +1,6 @@
 ---
 type: Note
+_organized: true
 ---
 # Игры, 07.2026
 

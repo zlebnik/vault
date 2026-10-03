@@ -1,5 +1,6 @@
 ---
 type: Note
+_organized: true
 ---
 
 # Книги, 06.2026

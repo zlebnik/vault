@@ -5,6 +5,7 @@ status: done
 url: https://www.instagram.com/reel/Dbu3P_etKFO/
 author: mishanavina
 captured: 2026-08-07T08:32:09.000Z
+_organized: true
 ---
 
 # Яблочный пирог с лаймом и сметаной

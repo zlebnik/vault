@@ -1,3 +1,6 @@
+---
+_organized: true
+---
 STAGE 1 (PLANNING) continues for GitHub issue #{{ISSUE}} — the maintainer left
 new comments on the issue instead of (or before) approving your plan. Same
 rules and OVERRIDES as before: headless, no plan mode, no AskUserQuestion, no
