@@ -250,6 +250,77 @@ sudo bash scripts/fix-asus-z13-thermal-guard.sh  # logger + emergency PPT limite
 7–15 min after `PM: suspend exit` with the machine idle (2026-07-26 04:02, 07-30 06:25,
 08-01 13:22, 08-03 04:04, 08-04 22:03, 08-07 05:42). Not thermal; separate investigation.
 
+### Spurious s2idle wake + MT7925 heal
+Suspend woke itself ~4 s later. [`scripts/diagnose-suspend-wake.sh`](scripts/diagnose-suspend-wake.sh)
+(read-only: snapshots every `wakeup_count`, suspends once, reports which counter and
+IRQ fired — run it in the same boot as the wake) found layered sources, all handled by
+[`scripts/fix-asus-z13-spurious-wake.sh`](scripts/fix-asus-z13-spurious-wake.sh):
+
+| Source | Fix | Mode |
+|--------|-----|------|
+| phantom **i8042 PS/2** IRQ1 (the real keyboard is USB, the port is vestigial) | udev: `serio0` `power/wakeup` off | `--i8042` |
+| **ITE8353:00** sensor hub, IRQ7 ~1/s | unbind during sleep (hook in `/usr/lib/systemd/system-sleep/` — this systemd build does not scan `/etc/…`) + wake flag off | `--i2c-unbind`, `--i2c` |
+| **EC** battery/AC Notify on IRQ9 | `acpi.ec_no_wakeup=Y` | `--ec-no-wakeup` |
+| gpe1A (only Wi-Fi suspect) | mask — deliberately not in `--all-safe` | `--gpe` |
+
+Bluetooth `13d3:3608` and the dock keyboard `0b05:1a30` are hard-protected as wake
+sources. `--wifi-heal` (part of `--full`) installs `omarchy-mt7925-heal.service`: reloads
+`mt7925e` when no wlan appears ~16 s after boot (firmware-load race).
+
+## Hardware enablement (2026-09-21)
+
+Beyond fixes — things the hardware can do that nothing was using. Same delivery:
+root half as a script, user half in `~/.config/hypr/*.lua`.
+
+### Tablet mode
+[`scripts/setup-asus-z13-tablet.sh`](scripts/setup-asus-z13-tablet.sh) installs
+`iio-sensor-proxy` (+ `libva-utils`) and a resume hook restarting it. User side:
+
+- `~/.local/bin/z13-autorotate` — reads `monitor-sensor`, rotates `eDP-1` + touchscreen
+  + pen together. Only while the dock `0b05:1a30` is **detached** (no `SW_TABLET_MODE`
+  on this machine, USB presence is the signal; re-checked every 3 s). The orientation
+  is written to `~/.local/state/omarchy/toggles/hypr/z13-rotation.lua`, which Omarchy
+  re-requires on every reload, so `hyprctl reload` on monitor hotplug keeps it; applied
+  live with `hyprctl eval`.
+- `autostart.lua`: `o.launch_on_start("z13-autorotate")`; `input.lua`: touch + pen
+  pinned to `eDP-1` (matters with the HDMI monitor attached).
+- `SUPER+CTRL+ALT+O` rotation lock, `SUPER+CTRL+ALT+K` on-screen keyboard
+  (`wvkbd-mobintl`, AUR: `omarchy pkg aur add wvkbd`).
+
+### GPU memory for local LLMs
+[`scripts/setup-strix-halo-gtt.sh`](scripts/setup-strix-halo-gtt.sh) — kernel default
+caps GTT at half of RAM (~60.7 of 127 GiB); `ttm.pages_limit=27787264` raises it to
+106 GiB (`--gib N` to change). Installs `llama-cpp` + `ggml-vulkan` from `extra` —
+Vulkan/RADV beats HIP for decode on gfx1151. By hand: BIOS UMA/VRAM → minimum (512 MB).
+ROCm (`rocm-hip-sdk`, `ggml-hip`, `ROCBLAS_USE_HIPBLASLT=1`) only if prompt processing
+or PyTorch needs it.
+
+### NPU (XDNA2)
+[`scripts/setup-strix-halo-npu.sh`](scripts/setup-strix-halo-npu.sh) — kernel side was
+already complete (`amdxdna`, `/dev/accel/accel0`, firmware); adds `xrt`,
+`xrt-plugin-amdxdna`, `fastflowlm` from `extra` and memlock=unlimited drop-ins.
+Niche: low-power small models, or alongside a busy GPU; the GPU is ~2.4× faster in decode.
+
+### Deliberately not installed
+| What | Why |
+|------|-----|
+| `[g14]`/`[ogc]` repo, `linux-g14`/`linux-ogc`, CachyOS kernel | `extra/asusctl` is current and asus-armoury is mainline since 6.19; the CachyOS patchset carries GZ302 regressions (asus_wmi writes block 60 s → EIO, s2idle wake loops) |
+| `amd_iommu=off` | ~6 % prompt processing, but amdxdna does not work without the IOMMU |
+| `amdgpu.gttsize` | deprecated, logs a warning — `ttm.pages_limit` replaces it |
+| `ryzenadj` | documented hard locks on Strix Halo; asus-armoury `ppt_*` is the upstream path |
+| `fwupd` for BIOS / dock firmware | nothing for GZ302EA on LVFS; reports of the ITE controller stuck in bootloader mode. BIOS via EZ Flash only |
+| `supergfxctl` | no dGPU, no XG Mobile |
+| `aur/iio-hyprland-git`, `hyprgrass` | stale since 2024-11 / plugin ABI fragile on Hyprland 0.56 |
+| `mt7925e disable_aspm=1` | upstream ASPM fixes landed; costs idle power; no symptoms here |
+| rear 13 MP camera | OV13B10 behind AMD ISP4 — no mainline driver yet |
+| TheRock ROCm nightlies | `rocminfo` segfaults reported on gfx1151 with 7.x kernels |
+
+### Retest log (old workarounds, one per boot)
+| Param | Removed | Result |
+|-------|---------|--------|
+| `amdgpu.gfxoff=0` | — | pending; watch `journalctl -k -g 'gfxoff\|SMU: No response'` for a week |
+| `amdgpu.dcdebugmask=0x10` | — | pending; if the black screen returns try `0x600`, never `0xe12` |
+
 ## Notes
 - The two amdgpu params are workarounds for early Strix Halo firmware/driver bugs;
   as `linux` / `linux-firmware` mature they may become removable (test one at a time).
